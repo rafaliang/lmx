@@ -19,6 +19,6 @@ import org.antlr.v4.runtime.*;
             walker.walk(tw, tree);
             tw.getResult();
             //tree.
-            //System.out.println(tree.toStringTree(parser)); // print LISP-style tree
+            System.out.println(tree.toStringTree(parser)); // print LISP-style tree
         }
     }
