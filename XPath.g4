@@ -4,8 +4,8 @@
 grammar XPath;
 
 ap :
-'doc('fileName')/'rp      #apSL
-|'doc('fileName')//'rp    #apDSL
+'doc("'fileName'")/'rp      #apSL
+|'doc("'fileName'")//'rp    #apDSL
 ;
 
 rp : 
@@ -16,19 +16,19 @@ tagName 	 #rpTAG
 | '*'        #rpSTAR
 | 'text()'   #rpTEXT
 | '('rp')'   #rpPARA
-| rp'/'rp 	 #rpSL
-| rp'//'rp 	 #rpDSL
+| left=rp'/'right=rp 	 #rpSL
+| left=rp'//'right=rp 	 #rpDSL
 | rp'['f']'  #rpF
-| rp','rp 	 #rpCOMMA
+| left=rp','right=rp 	 #rpCOMMA
 ;
 
 f:
 rp		    #filterRP
-| rp EQ rp  #filterEQ
-| rp IS rp  #filterIS
+| left=rp EQ right=rp  #filterEQ
+| left=rp IS right=rp  #filterIS
 | '('f')'   #filterPara
-| f AND f   #filterAND
-| f OR f    #filterOR
+| leftF=f AND rightF=f   #filterAND
+| leftF=f OR rightF=f    #filterOR
 | NOT f     #filterNOT
 ;
 

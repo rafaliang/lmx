@@ -26,7 +26,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node; 
 import org.w3c.dom.NodeList; 
 
-public class testWalker extends XPathBaseListener{
+public class testWalker2 extends XPathBaseListener{
 	private Document doc;
 	private Queue<Boolean> singleSL = new LinkedBlockingQueue<Boolean>();
 	//private List<String> res = new ArrayList<String>();
@@ -35,7 +35,7 @@ public class testWalker extends XPathBaseListener{
 	private List<Node> nodeList = new ArrayList<Node>();
 	private Map<Integer, String> typeMap=new HashMap<Integer, String>();
 	
-	testWalker(){
+	testWalker2(){
 		typeMap.put(1, "element");
 		typeMap.put(2, "attribute");
 		typeMap.put(3, "text");
@@ -149,7 +149,6 @@ public class testWalker extends XPathBaseListener{
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			
 			doc = builder.parse(file);
-			//doc
 			NodeList nl = doc.getChildNodes();
 			for (int i=0;i<nl.getLength();++i)
 				nodeList.add(nl.item(i));
@@ -176,8 +175,21 @@ public class testWalker extends XPathBaseListener{
 	
 	public void enterRpSL(XPathParser.RpSLContext ctx){
 		//System.out.println("rpSL");
-		System.out.println(ctx.rp());
+		//System.out.println(ctx.lop);
+		enterRpTAG((XPathParser.RpTAGContext)ctx.left);
+		//this.enterRp(ctx);
+		//enterRp((XPathParser.RpTAGContext)ctx.rop);
 		
+		
+	}
+	
+	public void enterFilterEQ(XPathParser.FilterEQContext ctx) {
+		System.out.println(ctx.left.getText());
+		System.out.println(ctx.right.getText());
+	}
+	
+	public void enterRpTAG(XPathParser.RpTAGContext ctx){
+		//System.out.println(ctx.getText());
 	}
 	
 	public void enterRpDSL(XPathParser.RpDSLContext ctx){
@@ -196,25 +208,6 @@ public class testWalker extends XPathBaseListener{
 		nodeList.addAll(h);
 	}
 	
-	public void enterTagName(XPathParser.TagNameContext ctx){
-		//System.out.println(ctx.getText());
-		Boolean isSingle = singleSL.poll();
-		if (!inF){
-			if (isSingle) nodeList = getChildrenByTag(nodeList, ctx.getText());
-			else nodeList = getDescendantByTag(nodeList, ctx.getText());
-		//nodeList = getChildrenByTag(nodeList, ctx.getText());
-		}
-		
-	}
-	
-	public void enterRpATT(XPathParser.RpATTContext ctx){
-		Boolean isSingle = singleSL.poll();
-		if (!inF){
-			if (isSingle) nodeList = getChildrenByAtt(nodeList, ctx.getText());
-			else nodeList = getDescendantByAtt(nodeList, ctx.getText());
-		//nodeList = getChildrenByTag(nodeList, ctx.getText());
-		}
-	}
 	
 	public void getResult(){
 		//System.out.println(res.toString());

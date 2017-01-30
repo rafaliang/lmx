@@ -4,9 +4,9 @@
 		<actor id="2">Liam Neeson</actor>
 		<actor id="3">Michael Caine</actor>
 	</actors>
-	<foo:singers>
-		<foo:singer id="4">Tom Waits</foo:singer>
-		<foo:singer id="5">B.B. King</foo:singer>
-		<foo:singer id="6">Ray Charles</foo:singer>
-	</foo:singers>
+	<singers>
+		<singer id="1">Tom Waits</singer>
+		<singer id="2">B.B. King</singer>
+		<singer id="3">Ray Charles</singer>
+	</singers>
 </root>
