@@ -15,7 +15,9 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAp(XPathParser.ApContext ctx) { }
+	@Override public void enterAp(XPathParser.ApContext ctx) {
+		System.out.print(ctx.toString());
+	}
 	/**
 	 * {@inheritDoc}
 	 *
