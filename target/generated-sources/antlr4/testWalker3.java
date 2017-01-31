@@ -43,13 +43,26 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 			node=nodeSt.pop();
 			nl=node.getChildNodes();
 			for (int j=0;j<nl.getLength();++j){
-				if (nl.item(j)!=null)
+				if (nl.item(j)!=null&& nl.item(j).getNodeType()!=10)
 					res.add(nl.item(j));
 			}
 		}
 		HashSet<Node> h = new HashSet<Node>(res);
 		res.clear();
 		res.addAll(h);
+		return res;
+	}
+	
+	private List<Node> getChildren(List<Node> lst){
+		List<Node> res = new ArrayList<Node>();
+		NodeList nl;
+		for (Node node:lst){
+			nl=node.getChildNodes();
+			for (int j=0;j<nl.getLength();++j){
+				if (nl.item(j)!=null && nl.item(j).getNodeType()!=10)
+					res.add(nl.item(j));
+			}
+		}
 		return res;
 	}
 	
@@ -65,11 +78,13 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 			
 			Document doc = builder.parse(file);
 			//doc
-			NodeList nl = doc.getChildNodes();
+			/*NodeList nl = doc.getChildNodes();
 			//nodeList.addAll((Collection<? extends Node>) nl);
 			
 			for (int i=0;i<nl.getLength();++i)
-				curList.add(nl.item(i));
+				curList.add(nl.item(i));*/
+			//System.out.println("doc : "+doc.getChildNodes().item(1).getNodeName());
+			curList.add(doc);
 			
 			//System.out.println("No:"+ doc.getElementsByTagName("NO").item(0).getFirstChild().getNodeValue());   
 		}
@@ -92,11 +107,12 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 			
 			Document doc = builder.parse(file);
 			//doc
-			NodeList nl = doc.getChildNodes();
+			/*NodeList nl = doc.getChildNodes();
 			//nodeList.addAll((Collection<? extends Node>) nl);
 			
 			for (int i=0;i<nl.getLength();++i)
-				curList.add(nl.item(i));
+				curList.add(nl.item(i));*/
+			curList.add(doc);
 			curList = this.getDescedants(curList);
 			
 			//System.out.println("No:"+ doc.getElementsByTagName("NO").item(0).getFirstChild().getNodeValue());   
@@ -128,13 +144,10 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 		//System.out.println("this is a RpTag");
 		List<Node> res = new ArrayList<Node>();
 		//System.out.println(ctx.tagName().getText());
-		for (int i=0;i<curList.size();++i){
-			Node node = curList.get(i);
-			NodeList nl = node.getChildNodes();
-			for (int j=0;j<nl.getLength();++j){
-				if (nl.item(j).getNodeName().equals(ctx.getText()))
-					res.add(nl.item(j));
-			}
+		List<Node> candidate = this.getChildren(curList);
+		for (int i=0;i<candidate.size();++i){
+			if (candidate.get(i).getNodeName().equals(ctx.getText()))
+				res.add(candidate.get(i));
 		}
 		//curList.clear();
 		//curList.addAll(res);
@@ -144,7 +157,7 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 	public List<Node> visitRpATT(XPathParser.RpATTContext ctx) {
 		//System.out.println("this is a RpAtt");
 		List<Node> res = new ArrayList<Node>();
-		System.out.println(ctx.attName().getText());
+		//System.out.println(ctx.attName().getText());
 		for (int i=0;i<curList.size();++i){
 			Node node = curList.get(i);
 			NamedNodeMap nnm = node.getAttributes();
@@ -197,7 +210,7 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 	
 	public List<Node> visitRpSTAR(XPathParser.RpSTARContext ctx) { 
 		//System.out.println("this is a RpStar");
-		return curList; 
+		return this.getChildren(curList); 
 	}
 	
 	public List<Node> visitRpCOMMA(XPathParser.RpCOMMAContext ctx) { 
@@ -221,14 +234,21 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 	}
 	
 	public List<Node> visitFilterIS(XPathParser.FilterISContext ctx) { 
-		List<Node> leftRes,rightRes = new ArrayList<Node>();
+		List<Node> leftRes,rightRes,res = new ArrayList<Node>();
 		leftRes = this.visit(ctx.left);
 		rightRes = this.visit(ctx.right);
 		//Collections.sort((List<Node>) leftRes);
-		return visitChildren(ctx); 
+		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
+		if (leftRes.size()!=rightRes.size()) return res;
+		else{
+			for (int i=0;i<leftRes.size();++i){
+				if (leftRes.get(i)==rightRes.get(i))
+					continue;
+				else return res;
+			}
+		}
+		return leftRes; 
 	}
 	
-	public void getResult(){
-		
-	}
+	
 }

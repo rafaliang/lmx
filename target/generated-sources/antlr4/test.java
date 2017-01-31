@@ -1,11 +1,65 @@
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.antlr.v4.runtime.*;
     import org.antlr.v4.runtime.tree.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
     public class test 
     {
+    	private static void write2xml(List<Node> lst){
+    		
+    		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder;
+    		try {
+    			builder = factory.newDocumentBuilder();
+    			Document document = builder.newDocument();
+    			Element tmp = document.createElement("result");
+    			for (Node node:lst){
+    				Node imported = document.importNode(node, true);
+    				tmp.appendChild(imported);
+        		}
+    			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                //for pretty print
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.transform(new DOMSource(tmp), new StreamResult("/Users/rafaliang/code/CSE232B/antlrTutorial/src/output.xml"));
+                /*DOMSource source = new DOMSource(document);
+     
+                //write to console or file
+                StreamResult console = new StreamResult(System.out);
+                StreamResult file = new StreamResult(new File("/Users/rafaliang/code/CSE232B/antlrTutorial/src/output.xml"));
+     
+                //write data
+                transformer.transform(source, console);
+                transformer.transform(source, file);
+                System.out.println("DONE");*/
+    		}
+    		catch (Exception e){System.out.println(e);}
+    		/*FileOutputStream out = null;   
+    		try{
+    			out = new FileOutputStream(new File("/Users/rafaliang/code/CSE232B/antlrTutorial/src/output.xml"));
+    			for (Node node:lst){
+    				//out.write(node.getTextContent());
+    			}
+    		}
+    		catch (Exception e){System.out.println(e);}*/
+    	          
+    	        
+    	}
+    	
         public static void main( String[] args) throws Exception 
         {
             ANTLRInputStream input = new ANTLRInputStream( System.in);
@@ -24,9 +78,10 @@ import org.w3c.dom.Node;
             testWalker3 tw3 = new testWalker3();
             //walker.walk(tw3, tree);
             List<Node> res = tw3.visit(tree);
-            System.out.println(res.size());
-            for (Node node:res)
-            	System.out.println(node.toString());
+            //System.out.println(res.size());
+            write2xml(res);
+            //for (Node node:res)
+            	//System.out.println(node.getNodeType());
             System.out.println(tree.toStringTree(parser)); // print LISP-style tree
         }
         
