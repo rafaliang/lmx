@@ -4,8 +4,10 @@
 grammar XPath;
 
 ap :
-'doc(\''fileName'\'")/'rp      #apSL
-|'doc(\''fileName'\')//'rp    #apDSL
+'doc(\''fileName'\'")/'rp    #apSL
+|'doc("'fileName'")/'rp    #apSL
+|'doc(\''fileName'\')//'rp   #apDSL
+| 'doc("'fileName'")//'rp   #apDSL
 ;
 
 rp : 
@@ -54,6 +56,7 @@ NOT : 'not';
  /*
   * NAME
   */
-
-NAME : [a-zA-Z_][a-zA-Z0-9]*;
-FILENAME : [a-zA-Z0-9/]+'.xml';
+//LETTER : [a-zA-Z_];
+//LETTERANDDIGIT : [a-zA-Z0-9_-];
+NAME : [a-zA-Z_] [a-zA-Z0-9_]*;
+FILENAME : [a-zA-Z0-9/_]+'.xml';

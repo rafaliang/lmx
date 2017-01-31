@@ -66,11 +66,26 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 		return res;
 	}
 	
+	private List<Node> getParents(List<Node> lst){
+		List<Node> res = new ArrayList<Node>();
+		for (Node node:curList){
+			if (node.getNodeType()==2){
+				//System.out.println(((Attr)node).getOwnerElement());
+				res.add(((Attr)node).getOwnerElement());
+			}
+			else res.add(node.getParentNode());
+		}
+		HashSet<Node> h = new HashSet<Node>(res);
+		res.clear();
+		res.addAll(h);
+		return res;
+	}
+	
 	public List<Node> visitApSL(XPathParser.ApSLContext ctx){
 		//List<Node> nodeList = new ArrayList<Node>();
 		try{
-			//String xmlFile = ctx.fileName().getText();
-			String xmlFile ="/Users/rafaliang/code/CSE232B/antlrTutorial/src/j_caesar.xml";
+			String xmlFile = ctx.fileName().getText();
+			//String xmlFile ="/Users/rafaliang/code/CSE232B/antlrTutorial/src/j_caesar.xml";
 			File file = new File(xmlFile);
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			
@@ -98,8 +113,8 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 		//List<Node> nodeList = new ArrayList<Node>();
 		//System.out.println("this is a ApDSL");
 		try{
-			//String xmlFile = ctx.fileName().getText();
-			String xmlFile ="/Users/rafaliang/code/CSE232B/antlrTutorial/src/j_caesar.xml";
+			String xmlFile = ctx.fileName().getText();
+			//String xmlFile ="/Users/rafaliang/code/CSE232B/antlrTutorial/src/j_caesar.xml";
 			File file = new File(xmlFile);
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			
@@ -179,15 +194,7 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 	
 	public List<Node> visitRpDDOT(XPathParser.RpDDOTContext ctx) {
 		//System.out.println("this is a RpDdot");
-		List<Node> res = new ArrayList<Node>();
-		for (Node node:curList){
-			if (node.getNodeType()==2){
-				//System.out.println(((Attr)node).getOwnerElement());
-				res.add(((Attr)node).getOwnerElement());
-			}
-			else res.add(node.getParentNode());
-		}
-		return res;
+		return getParents(curList);
 	}
 	
 	public List<Node> visitRpTEXT(XPathParser.RpTEXTContext ctx) {
@@ -250,5 +257,40 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 		return leftRes; 
 	}
 	
+	public List<Node> visitFilterPara(XPathParser.FilterParaContext ctx) { 
+		return visit(ctx.f()); 
+	}
+	
+	public List<Node> visitFilterRP(XPathParser.FilterRPContext ctx) { 
+		return visit(ctx.rp()); 
+	}
+	
+	public List<Node> visitFilterNOT(XPathParser.FilterNOTContext ctx) {
+		List<Node> res = new ArrayList<Node>();
+		List<Node> tmp = visit(ctx.f());
+		if (tmp.isEmpty())
+			res.add(null);
+		return res; 
+	}
+	
+	public List<Node> visitFilterEQ(XPathParser.FilterEQContext ctx) { 
+		return visitChildren(ctx); 
+	}
+	
+	public List<Node> visitFilterOR(XPathParser.FilterORContext ctx) { 
+		List<Node> res = new ArrayList<Node>();
+		List<Node> left = visit(ctx.leftF);
+		List<Node> right = visit(ctx.rightF);
+		if (!left.isEmpty() || !right.isEmpty()) res.add(null);
+		return res;
+	}
+	
+	public List<Node> visitFilterAND(XPathParser.FilterANDContext ctx) { 
+		List<Node> res = new ArrayList<Node>();
+		List<Node> left = visit(ctx.leftF);
+		List<Node> right = visit(ctx.rightF);
+		if (!left.isEmpty() && !right.isEmpty()) res.add(null);
+		return res;
+	}
 	
 }
