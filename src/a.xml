@@ -6,7 +6,7 @@
 	</actors>
 	<singers>
 		<singer id="1">Tom Waits</singer>
-		<singer id="2">B.B. King</singer>
-		<singer id="3">Ray Charles</singer>
+		<singer id="5">B.B. King</singer>
+		<singer id="6">Ray Charles</singer>
 	</singers>
 </root>

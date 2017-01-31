@@ -14,6 +14,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.antlr.v4.runtime.*;
     import org.antlr.v4.runtime.tree.*;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,7 +30,16 @@ import org.w3c.dom.Node;
     			Element tmp = document.createElement("result");
     			for (Node node:lst){
     				Node imported = document.importNode(node, true);
-    				tmp.appendChild(imported);
+    				if (node.getNodeType()==2){
+    					
+    					Element ele = document.createElement("Attribute");
+    					ele.setAttributeNodeNS((Attr)imported);
+    					tmp.appendChild(ele);
+    				}
+    				else{
+    					tmp.appendChild(imported);
+    				}
+    				//tmp.appendChild(node);
         		}
     			TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
