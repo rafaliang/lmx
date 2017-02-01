@@ -240,8 +240,7 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 			curList.add(node);
 			if(!visit(ctx.f()).isEmpty()) res.add(node);
 		}
-		if (!res.isEmpty()) return tmp;
-		else return new ArrayList<Node>(); 
+		return res; 
 	}
 	
 	public List<Node> visitFilterIS(XPathParser.FilterISContext ctx) { 
