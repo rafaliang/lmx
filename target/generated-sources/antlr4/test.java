@@ -29,43 +29,31 @@ import org.w3c.dom.Node;
     			Document document = builder.newDocument();
     			Element tmp = document.createElement("result");
     			for (Node node:lst){
-    				Node imported = document.importNode(node, true);
     				if (node.getNodeType()==2){
-    					
+    					Node imported = document.importNode(node, true);
     					Element ele = document.createElement("Attribute");
     					ele.setAttributeNodeNS((Attr)imported);
     					tmp.appendChild(ele);
     				}
+    				else if (node.getNodeType()==9){
+    					//System.out.println("doc");
+    					TransformerFactory transformerFactory = TransformerFactory.newInstance();
+    	                Transformer transformer = transformerFactory.newTransformer();
+    	                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    	                transformer.transform(new DOMSource(node), new StreamResult("/Users/rafaliang/code/CSE232B/antlrTutorial/src/output.xml"));
+    	                return;
+    				}
     				else{
+    					Node imported = document.importNode(node, true);
     					tmp.appendChild(imported);
     				}
-    				//tmp.appendChild(node);
         		}
     			TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
-                //for pretty print
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                 transformer.transform(new DOMSource(tmp), new StreamResult("/Users/rafaliang/code/CSE232B/antlrTutorial/src/output.xml"));
-                /*DOMSource source = new DOMSource(document);
-     
-                //write to console or file
-                StreamResult console = new StreamResult(System.out);
-                StreamResult file = new StreamResult(new File("/Users/rafaliang/code/CSE232B/antlrTutorial/src/output.xml"));
-     
-                //write data
-                transformer.transform(source, console);
-                transformer.transform(source, file);
-                System.out.println("DONE");*/
     		}
     		catch (Exception e){System.out.println(e);}
-    		/*FileOutputStream out = null;   
-    		try{
-    			out = new FileOutputStream(new File("/Users/rafaliang/code/CSE232B/antlrTutorial/src/output.xml"));
-    			for (Node node:lst){
-    				//out.write(node.getTextContent());
-    			}
-    		}
-    		catch (Exception e){System.out.println(e);}*/
     	          
     	        
     	}
