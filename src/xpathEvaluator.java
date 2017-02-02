@@ -30,12 +30,13 @@ import org.w3c.dom.NodeList;
 
 public class xpathEvaluator{
 	
-	private List<Node> curList = new ArrayList<Node>();
-	private xpVisitor visitor;
+	protected List<Node> curList;
+	protected xpVisitor visitor;
 	
-	xpathEvaluator(xpVisitor xpvisitor, List<Node> lst){
-		this.visitor=xpvisitor;
-		this.curList=lst;
+	xpathEvaluator(xpVisitor visitor, List<Node> curList){
+		this.visitor=visitor;
+		this.curList=curList;
+		
 	}
 	
 	private List<Node> getDescedants(List<Node> lst){
@@ -241,7 +242,8 @@ public class xpathEvaluator{
 		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
 		for (Node node1:leftRes){
 			for (Node node2:rightRes){
-				if (node1.getNodeValue().equals(node2.getNodeValue()))
+				//if (node1.getNodeValue().equals(node2.getNodeValue()))
+				if (node1.isEqualNode(node2))
 					return leftRes;
 			}
 		}

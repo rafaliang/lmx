@@ -5,7 +5,7 @@ grammar XPath;
 
 
 ap :
-'doc(\''fileName'\'")/'rp    #apSL
+'doc(\''fileName'\')/'rp    #apSL
 |'doc("'fileName'")/'rp    #apSL
 |'doc(\''fileName'\')//'rp   #apDSL
 | 'doc("'fileName'")//'rp   #apDSL
@@ -58,6 +58,6 @@ NOT : 'not';
 //LETTER : [a-zA-Z_];
 //LETTERANDDIGIT : [a-zA-Z0-9_-];
 FILENAME : [a-zA-Z0-9/._]+'.xml';
-NAME : [a-zA-Z_] [a-zA-Z0-9_]*;
+NAME : [a-zA-Z_] [a-zA-Z0-9_-]*;
 
 WS : [ \t\r\n]+ -> skip ;  // skip spaces, tabs, newlines

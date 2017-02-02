@@ -29,10 +29,12 @@ import org.w3c.dom.NodeList;
 public class xpVisitor extends XPathBaseVisitor<List<Node>>{
 	private List<Node> curList;
 	private xpathEvaluator xpEvaluator;
+	private xqueryEvaluator xqEvaluator;
 	
 	xpVisitor(){
 		curList = new ArrayList<Node>();
 		xpEvaluator = new xpathEvaluator(this,curList);
+		xqEvaluator = new xqueryEvaluator(this,curList);
 	}
 	
 	public List<Node> visitApSL(XPathParser.ApSLContext ctx){
@@ -44,6 +46,7 @@ public class xpVisitor extends XPathBaseVisitor<List<Node>>{
 	}
 	
 	public List<Node> visitRpSL(XPathParser.RpSLContext ctx) {
+		xpEvaluator.evalRpSL(ctx);
 		return xpEvaluator.evalRpSL(ctx);
 	}
 	

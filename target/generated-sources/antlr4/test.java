@@ -67,7 +67,7 @@ import org.w3c.dom.Node;
     	
         public static void main( String[] args) throws Exception 
         {
-        	String testcase = "doc(\"./src/a.xml\")//actor//.";
+        	String testcase = "doc(\"./src/a.xml\")//actor/@id";
             //ANTLRInputStream input = new ANTLRInputStream( System.in);
         	ANTLRInputStream input = new ANTLRInputStream( testcase);
             XPathLexer lexer = new XPathLexer(input);
