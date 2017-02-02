@@ -28,9 +28,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node; 
 import org.w3c.dom.NodeList; 
 
-public class testWalker3 extends XPathBaseVisitor<List<Node>>{
+public class xpathEvaluator{
 	
 	private List<Node> curList = new ArrayList<Node>();
+	private xpVisitor visitor;
 	
 	private List<Node> getDescedants(List<Node> lst){
 		List<Node> res = new ArrayList<Node>();
@@ -49,7 +50,10 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 				}
 			}
 		}
-		return this.removeDup(res);
+		HashSet<Node> h = new HashSet<Node>(res);
+		res.clear();
+		res.addAll(h);
+		return res;
 	}
 	
 	private List<Node> getChildren(List<Node> lst){
@@ -69,106 +73,126 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 		List<Node> res = new ArrayList<Node>();
 		for (Node node:lst){
 			if (node.getNodeType()==2){
+				//System.out.println(((Attr)node).getOwnerElement());
 				res.add(((Attr)node).getOwnerElement());
 			}
 			else res.add(node.getParentNode());
 		}
-		return this.removeDup(res);
-	}
-	
-	private List<Node> removeDup(List<Node> lst){
-		List<Node> res = new ArrayList<Node>();
-		HashSet<Node> h = new HashSet<Node>(lst);
+		HashSet<Node> h = new HashSet<Node>(res);
+		res.clear();
 		res.addAll(h);
 		return res;
 	}
 	
-	private Node readXML(String fileName){
-		Document doc = null;
+	public List<Node> evaluateApSL(XPathParser.ApSLContext ctx){
+		//List<Node> lst = new ArrayList<Node>();
 		try{
-			File file = new File(fileName);
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			doc = builder.parse(file);
+			String xmlFile = ctx.fileName().getText();
+			File file = new File(xmlFile);
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();			
+			DocumentBuilder builder = factory.newDocumentBuilder();			
+			Document doc = builder.parse(file);
+			curList.add(doc);  
 		}
 		catch (Exception e){e.printStackTrace();}
-		return doc;
+		//visitor.setNodeList(lst);
+		return visitor.visit(ctx.rp());
 	}
 	
-	public List<Node> visitApSL(XPathParser.ApSLContext ctx){
-		String xmlFile = ctx.fileName().getText();
-		curList.add(this.readXML(xmlFile));
-		return visit(ctx.rp());
+	public List<Node> evaluateApDSL(XPathParser.ApDSLContext ctx){
+		List<Node> lst = new ArrayList<Node>();
+		try{
+			String xmlFile = ctx.fileName().getText();
+			File file = new File(xmlFile);
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document doc = builder.parse(file);
+			curList.add(doc);
+			curList = this.getDescedants(curList);  
+		}
+		catch (Exception e){e.printStackTrace();}
+		return visitor.visit(ctx.rp());
 	}
 	
-	public List<Node> visitApDSL(XPathParser.ApDSLContext ctx){
-		String xmlFile = ctx.fileName().getText();
-		curList.add(this.readXML(xmlFile));
-		curList = this.getDescedants(curList);
-		return visit(ctx.rp());
+	
+	public List<Node> evaluateRpSL(XPathParser.RpSLContext ctx, List<Node> cur) {
+		curList=visitor.visit(ctx.left);
+		return visitor.visit(ctx.right);
 	}
 	
-	public List<Node> visitRpSL(XPathParser.RpSLContext ctx) {
-		curList = this.visit(ctx.left);
-		return this.visit(ctx.right);
-	}
-	
-	public List<Node> visitRpDSL(XPathParser.RpDSLContext ctx) {
-		curList = this.visit(ctx.left);
-		curList = this.getDescedants(curList);
-		return this.visit(ctx.right);
+	public List<Node> evaluateRpDSL(XPathParser.RpDSLContext ctx, List<Node> cur) {
+		visitor.setNodeList(cur);
+		visitor.setNodeList(this.getDescedants(visitor.visit(ctx.left)));
+		return visitor.visit(ctx.right);
 	}
 	
 	public List<Node> visitRpTAG(XPathParser.RpTAGContext ctx) {
+		//System.out.println("this is a RpTag");
 		List<Node> res = new ArrayList<Node>();
+		//System.out.println(ctx.tagName().getText());
 		List<Node> candidate = this.getChildren(curList);
 		for (int i=0;i<candidate.size();++i){
 			if (candidate.get(i).getNodeName().equals(ctx.getText()))
 				res.add(candidate.get(i));
 		}
+		//curList.clear();
+		//curList.addAll(res);
 		return res;
 	}
 	
 	public List<Node> visitRpATT(XPathParser.RpATTContext ctx) {
+		//System.out.println("this is a RpAtt");
 		List<Node> res = new ArrayList<Node>();
+		//System.out.println(ctx.attName().getText());
 		for (int i=0;i<curList.size();++i){
 			Node node = curList.get(i);
 			NamedNodeMap nnm = node.getAttributes();
 			for (int j=0;j<nnm.getLength();++j){
+				//System.out.println(nnm.item(j));
 				if (nnm.item(j).getNodeName().equals(ctx.getText().substring(1)))
 					res.add(nnm.item(j));
 			}
 		}
+		//curList.clear();
+		//curList.addAll(res);
 		return res;
 	}
 	
 	public List<Node> visitRpDOT(XPathParser.RpDOTContext ctx) {
+		//System.out.println("this is a RpDot");
 		return curList;
 	}
 	
 	public List<Node> visitRpDDOT(XPathParser.RpDDOTContext ctx) {
+		//System.out.println("this is a RpDdot");
 		return getParents(curList);
 	}
 	
 	public List<Node> visitRpTEXT(XPathParser.RpTEXTContext ctx) {
+		//System.out.println("this is a RpText");
 		List<Node> res = new ArrayList<Node>();
 		for (Node node:curList){
 			Node n = node.getChildNodes().item(0);
+			//System.out.println(n.getNodeType());
 			if (n.getNodeType()==3)
 				res.add(n);
+			//node.TEXT_NODE
 		}
 		return res; 
 	}
 	
 	public List<Node> visitRpPARA(XPathParser.RpPARAContext ctx) {
+		//System.out.println("this is a RpPara");
 		return visit(ctx.rp()); 
 	}
 	
 	public List<Node> visitRpSTAR(XPathParser.RpSTARContext ctx) { 
+		//System.out.println("this is a RpStar");
 		return this.getChildren(curList); 
 	}
 	
 	public List<Node> visitRpCOMMA(XPathParser.RpCOMMAContext ctx) { 
+		//System.out.println("this is a RpComma");
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = new ArrayList<Node>();
 		tmp.addAll(curList);
@@ -182,6 +206,7 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 	public List<Node> visitRpF(XPathParser.RpFContext ctx) {
 		List<Node> tmp = this.visit(ctx.rp());
 		List<Node> res = new ArrayList<Node>();
+		//List<Node> satisfied = new ArrayList<Node>();
 		for (Node node:tmp){
 			curList.clear();
 			curList.add(node);
@@ -198,6 +223,7 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 		curList.clear();
 		curList.addAll(tmp);
 		rightRes = this.visit(ctx.right);
+		//Collections.sort((List<Node>) leftRes);
 		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
 		for (Node node1:leftRes){
 			for (Node node2:rightRes){
@@ -232,6 +258,10 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 		curList.clear();
 		curList.addAll(tmp);
 		rightRes = this.visit(ctx.right);
+		//System.out.println(leftRes);
+		//System.out.println(curList);
+		//System.out.println(rightRes);
+		//Collections.sort((List<Node>) leftRes);
 		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
 		for (Node node1:leftRes){
 			for (Node node2:rightRes){

@@ -40,7 +40,7 @@ import org.w3c.dom.Node;
     					TransformerFactory transformerFactory = TransformerFactory.newInstance();
     	                Transformer transformer = transformerFactory.newTransformer();
     	                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    	                transformer.transform(new DOMSource(node), new StreamResult("/Users/rafaliang/code/CSE232B/antlrTutorial/src/output.xml"));
+    	                transformer.transform(new DOMSource(node), new StreamResult("/Users/rafaliang/git/lmx/src/output.xml"));
     	                return;
     				}
     				else{
@@ -51,7 +51,7 @@ import org.w3c.dom.Node;
     			TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.transform(new DOMSource(tmp), new StreamResult("/Users/rafaliang/code/CSE232B/antlrTutorial/src/output.xml"));
+                transformer.transform(new DOMSource(tmp), new StreamResult("/Users/rafaliang/git/lmx/src/output.xml"));
     		}
     		catch (Exception e){System.out.println(e);}
     	          
