@@ -28,7 +28,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node; 
 import org.w3c.dom.NodeList; 
 
-public class testWalker3 extends XPathBaseVisitor<List<Node>>{
+public class testWalker4 extends XPathBaseVisitor<List<Node>>{
 	
 	// current nodes list
 	private List<Node> curList = new ArrayList<Node>();
@@ -194,32 +194,34 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 	}
 	
 	// rp: [rp(f)]R(n)
-	// clear or push?
+	// clear?
 	public List<Node> visitRpF(XPathParser.RpFContext ctx) {
 		List<Node> tmp = this.visit(ctx.rp());
 		List<Node> res = new ArrayList<Node>();
 		for (Node node:tmp){
-			curList.clear();
-			curList.add(node);
+			//curList.clear();
+			//curList.add(node);
 			if(!visit(ctx.f()).isEmpty()) res.add(node);
 		}
 		return res; 
 	}
 	
 	// f: [rp1 is rp2]F(n) [rp1 == rp2]F(n)
+	// array list initialization
+	// compare node???
 	public List<Node> visitFilterIS(XPathParser.FilterISContext ctx) { 
-		List<Node> leftRes,rightRes,tmp = new ArrayList<Node>();
+		List<Node> tmp = new ArrayList<Node>();
 		List<Node> res = new ArrayList<Node>();
 		tmp.addAll(curList);
-		leftRes = this.visit(ctx.left);
+		List<Node> leftRes = this.visit(ctx.left);
 		curList.clear();
 		curList.addAll(tmp);
-		rightRes = this.visit(ctx.right);
+		List<Node> rightRes = this.visit(ctx.right);
 		//Collections.sort((List<Node>) leftRes);
 		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
 		for (Node node1:leftRes){
 			for (Node node2:rightRes){
-				if (node1==node2)
+				if (node1.isSameNode(node2))
 					return leftRes;
 			}
 		}
@@ -237,7 +239,6 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 	}
 	
 	// f: [not f]F(n)
-	// ??????????
 	public List<Node> visitFilterNOT(XPathParser.FilterNOTContext ctx) {
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = visit(ctx.f());
@@ -247,22 +248,22 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 	}
 	
 	// f: [rp1 eq rp2]F(n) [rp1 = rp2]F(n)
+	// clear???
+	// array list initialization
 	public List<Node> visitFilterEQ(XPathParser.FilterEQContext ctx) { 
-		List<Node> leftRes,rightRes,tmp = new ArrayList<Node>();
+		List<Node> tmp = new ArrayList<Node>();
 		List<Node> res = new ArrayList<Node>();
 		tmp.addAll(curList);
-		leftRes = this.visit(ctx.left);
+		List<Node> leftRes = this.visit(ctx.left);
 		curList.clear();
 		curList.addAll(tmp);
-		rightRes = this.visit(ctx.right);
-		//System.out.println(leftRes);
-		//System.out.println(curList);
-		//System.out.println(rightRes);
+		List<Node> rightRes = this.visit(ctx.right);
 		//Collections.sort((List<Node>) leftRes);
 		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
 		for (Node node1:leftRes){
 			for (Node node2:rightRes){
-				if (node1.getNodeValue().equals(node2.getNodeValue()))
+				//if (node1.getNodeValue().equals(node2.getNodeValue()))
+				if (node1.equals(node2))
 					return leftRes;
 			}
 		}
@@ -271,6 +272,7 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 	
 	// f: [rp1 or rp2]F(n)
 	// ????????????
+	// what if doc("a.xml")/actor (the result is empty)
 	public List<Node> visitFilterOR(XPathParser.FilterORContext ctx) { 
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = new ArrayList<Node>();

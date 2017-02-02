@@ -4,10 +4,10 @@
 grammar XPath;
 
 ap :
-'doc(\''fileName'\'")/'rp    #apSL
-|'doc("'fileName'")/'rp    #apSL
-|'doc(\''fileName'\')//'rp   #apDSL
-| 'doc("'fileName'")//'rp   #apDSL
+'doc(\'' fileName '\')/' rp    #apSL
+|'doc(\"' fileName '\")/' rp    #apSL
+|'doc(\'' fileName '\')//'rp   #apDSL
+| 'doc(\"' fileName '\")//'rp   #apDSL
 ;
 
 rp : 
