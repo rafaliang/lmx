@@ -254,6 +254,7 @@ public class testWalker3 extends XPathBaseVisitor<List<Node>>{
 		return res;
 	}
 	
+	
 	public List<Node> visitFilterAND(XPathParser.FilterANDContext ctx) { 
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = new ArrayList<Node>();
