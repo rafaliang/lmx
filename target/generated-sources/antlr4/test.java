@@ -24,6 +24,7 @@ import org.w3c.dom.Node;
     		
     		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder;
+			String fileName = "./src/output.xml";
     		try {
     			builder = factory.newDocumentBuilder();
     			Document document = builder.newDocument();
@@ -35,12 +36,18 @@ import org.w3c.dom.Node;
     					ele.setAttributeNodeNS((Attr)imported);
     					tmp.appendChild(ele);
     				}
+    				else if (node.getNodeType()==3){
+    					Node imported = document.importNode(node, true);
+    					Element ele = document.createElement("TEXT");
+    					ele.appendChild(imported);
+    					tmp.appendChild(ele);
+    				}
     				else if (node.getNodeType()==9){
     					//System.out.println("doc");
     					TransformerFactory transformerFactory = TransformerFactory.newInstance();
     	                Transformer transformer = transformerFactory.newTransformer();
     	                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    	                transformer.transform(new DOMSource(node), new StreamResult("/Users/rafaliang/git/lmx/src/output.xml"));
+    	                transformer.transform(new DOMSource(node), new StreamResult(fileName));
     	                return;
     				}
     				else{
@@ -51,7 +58,7 @@ import org.w3c.dom.Node;
     			TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.transform(new DOMSource(tmp), new StreamResult("/Users/rafaliang/git/lmx/src/output.xml"));
+                transformer.transform(new DOMSource(tmp), new StreamResult(fileName));
     		}
     		catch (Exception e){System.out.println(e);}
     	          
@@ -60,26 +67,19 @@ import org.w3c.dom.Node;
     	
         public static void main( String[] args) throws Exception 
         {
-            ANTLRInputStream input = new ANTLRInputStream( System.in);
-
+        	String testcase = "doc(\"./src/a.xml\")//actor//.";
+            //ANTLRInputStream input = new ANTLRInputStream( System.in);
+        	ANTLRInputStream input = new ANTLRInputStream( testcase);
             XPathLexer lexer = new XPathLexer(input);
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
             XPathParser parser = new XPathParser(tokens);
             ParseTree tree = parser.ap(); // begin parsing at rule 'exp'
-            ParseTreeWalker walker = new ParseTreeWalker();
-            testWalker tw = new testWalker();
-            //walker.walk(tw, tree);
-            //tw.getResult();
-            //testWalker2 tw2 = new testWalker2();
-            testWalker3 tw3 = new testWalker3();
-            //walker.walk(tw3, tree);
-            List<Node> res = tw3.visit(tree);
-            //System.out.println(res.size());
+            //ParseTreeWalker walker = new ParseTreeWalker();
+            xpVisitor xpVisitor = new xpVisitor();
+            List<Node> res = xpVisitor.visit(tree);
             write2xml(res);
-            //for (Node node:res)
-            	//System.out.println(node.getNodeType());
             System.out.println(tree.toStringTree(parser)); // print LISP-style tree
         }
         

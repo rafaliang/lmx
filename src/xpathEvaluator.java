@@ -33,6 +33,11 @@ public class xpathEvaluator{
 	private List<Node> curList = new ArrayList<Node>();
 	private xpVisitor visitor;
 	
+	xpathEvaluator(xpVisitor xpvisitor, List<Node> lst){
+		this.visitor=xpvisitor;
+		this.curList=lst;
+	}
+	
 	private List<Node> getDescedants(List<Node> lst){
 		List<Node> res = new ArrayList<Node>();
 		Queue<Node> nodeSt = new LinkedBlockingQueue<Node>();
@@ -50,10 +55,7 @@ public class xpathEvaluator{
 				}
 			}
 		}
-		HashSet<Node> h = new HashSet<Node>(res);
-		res.clear();
-		res.addAll(h);
-		return res;
+		return this.removeDup(res);
 	}
 	
 	private List<Node> getChildren(List<Node> lst){
@@ -73,157 +75,135 @@ public class xpathEvaluator{
 		List<Node> res = new ArrayList<Node>();
 		for (Node node:lst){
 			if (node.getNodeType()==2){
-				//System.out.println(((Attr)node).getOwnerElement());
 				res.add(((Attr)node).getOwnerElement());
 			}
 			else res.add(node.getParentNode());
 		}
-		HashSet<Node> h = new HashSet<Node>(res);
-		res.clear();
+		return this.removeDup(res);
+	}
+	
+	private List<Node> removeDup(List<Node> lst){
+		List<Node> res = new ArrayList<Node>();
+		HashSet<Node> h = new HashSet<Node>(lst);
 		res.addAll(h);
 		return res;
 	}
 	
-	public List<Node> evaluateApSL(XPathParser.ApSLContext ctx){
-		//List<Node> lst = new ArrayList<Node>();
+	private Node readXML(String fileName){
+		Document doc = null;
 		try{
-			String xmlFile = ctx.fileName().getText();
-			File file = new File(xmlFile);
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();			
-			DocumentBuilder builder = factory.newDocumentBuilder();			
-			Document doc = builder.parse(file);
-			curList.add(doc);  
-		}
-		catch (Exception e){e.printStackTrace();}
-		//visitor.setNodeList(lst);
-		return visitor.visit(ctx.rp());
-	}
-	
-	public List<Node> evaluateApDSL(XPathParser.ApDSLContext ctx){
-		List<Node> lst = new ArrayList<Node>();
-		try{
-			String xmlFile = ctx.fileName().getText();
-			File file = new File(xmlFile);
+			File file = new File(fileName);
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(file);
-			curList.add(doc);
-			curList = this.getDescedants(curList);  
+			doc = builder.parse(file);
 		}
 		catch (Exception e){e.printStackTrace();}
+		return doc;
+	}
+	
+	public List<Node> evalApSL(XPathParser.ApSLContext ctx){
+		String xmlFile = ctx.fileName().getText();
+		curList.add(this.readXML(xmlFile));
 		return visitor.visit(ctx.rp());
 	}
 	
+	public List<Node> evalApDSL(XPathParser.ApDSLContext ctx){
+		String xmlFile = ctx.fileName().getText();
+		curList.add(this.readXML(xmlFile));
+		curList = this.getDescedants(curList);
+		return visitor.visit(ctx.rp());
+	}
 	
-	public List<Node> evaluateRpSL(XPathParser.RpSLContext ctx, List<Node> cur) {
-		curList=visitor.visit(ctx.left);
+	public List<Node> evalRpSL(XPathParser.RpSLContext ctx) {
+		curList = visitor.visit(ctx.left);
 		return visitor.visit(ctx.right);
 	}
 	
-	public List<Node> evaluateRpDSL(XPathParser.RpDSLContext ctx, List<Node> cur) {
-		visitor.setNodeList(cur);
-		visitor.setNodeList(this.getDescedants(visitor.visit(ctx.left)));
+	public List<Node> evalRpDSL(XPathParser.RpDSLContext ctx) {
+		curList = visitor.visit(ctx.left);
+		curList = this.getDescedants(curList);
 		return visitor.visit(ctx.right);
 	}
 	
-	public List<Node> visitRpTAG(XPathParser.RpTAGContext ctx) {
-		//System.out.println("this is a RpTag");
+	public List<Node> evalRpTAG(XPathParser.RpTAGContext ctx) {
 		List<Node> res = new ArrayList<Node>();
-		//System.out.println(ctx.tagName().getText());
 		List<Node> candidate = this.getChildren(curList);
 		for (int i=0;i<candidate.size();++i){
 			if (candidate.get(i).getNodeName().equals(ctx.getText()))
 				res.add(candidate.get(i));
 		}
-		//curList.clear();
-		//curList.addAll(res);
 		return res;
 	}
 	
-	public List<Node> visitRpATT(XPathParser.RpATTContext ctx) {
-		//System.out.println("this is a RpAtt");
+	public List<Node> evalRpATT(XPathParser.RpATTContext ctx) {
 		List<Node> res = new ArrayList<Node>();
-		//System.out.println(ctx.attName().getText());
 		for (int i=0;i<curList.size();++i){
 			Node node = curList.get(i);
 			NamedNodeMap nnm = node.getAttributes();
 			for (int j=0;j<nnm.getLength();++j){
-				//System.out.println(nnm.item(j));
 				if (nnm.item(j).getNodeName().equals(ctx.getText().substring(1)))
 					res.add(nnm.item(j));
 			}
 		}
-		//curList.clear();
-		//curList.addAll(res);
 		return res;
 	}
 	
-	public List<Node> visitRpDOT(XPathParser.RpDOTContext ctx) {
-		//System.out.println("this is a RpDot");
+	public List<Node> evalRpDOT(XPathParser.RpDOTContext ctx) {
 		return curList;
 	}
 	
-	public List<Node> visitRpDDOT(XPathParser.RpDDOTContext ctx) {
-		//System.out.println("this is a RpDdot");
+	public List<Node> evalRpDDOT(XPathParser.RpDDOTContext ctx) {
 		return getParents(curList);
 	}
 	
-	public List<Node> visitRpTEXT(XPathParser.RpTEXTContext ctx) {
-		//System.out.println("this is a RpText");
+	public List<Node> evalRpTEXT(XPathParser.RpTEXTContext ctx) {
 		List<Node> res = new ArrayList<Node>();
 		for (Node node:curList){
 			Node n = node.getChildNodes().item(0);
-			//System.out.println(n.getNodeType());
 			if (n.getNodeType()==3)
 				res.add(n);
-			//node.TEXT_NODE
 		}
 		return res; 
 	}
 	
-	public List<Node> visitRpPARA(XPathParser.RpPARAContext ctx) {
-		//System.out.println("this is a RpPara");
-		return visit(ctx.rp()); 
+	public List<Node> evalRpPARA(XPathParser.RpPARAContext ctx) {
+		return visitor.visit(ctx.rp()); 
 	}
 	
-	public List<Node> visitRpSTAR(XPathParser.RpSTARContext ctx) { 
-		//System.out.println("this is a RpStar");
+	public List<Node> evalRpSTAR(XPathParser.RpSTARContext ctx) { 
 		return this.getChildren(curList); 
 	}
 	
-	public List<Node> visitRpCOMMA(XPathParser.RpCOMMAContext ctx) { 
-		//System.out.println("this is a RpComma");
+	public List<Node> evalRpCOMMA(XPathParser.RpCOMMAContext ctx) { 
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = new ArrayList<Node>();
 		tmp.addAll(curList);
-		res.addAll(this.visit(ctx.left));
+		res.addAll(visitor.visit(ctx.left));
 		curList.clear();
 		curList.addAll(tmp);
-		res.addAll(this.visit(ctx.right));
+		res.addAll(visitor.visit(ctx.right));
 		return res; 
 	}
 	
-	public List<Node> visitRpF(XPathParser.RpFContext ctx) {
-		List<Node> tmp = this.visit(ctx.rp());
+	public List<Node> evalRpF(XPathParser.RpFContext ctx) {
+		List<Node> tmp = visitor.visit(ctx.rp());
 		List<Node> res = new ArrayList<Node>();
-		//List<Node> satisfied = new ArrayList<Node>();
 		for (Node node:tmp){
 			curList.clear();
 			curList.add(node);
-			if(!visit(ctx.f()).isEmpty()) res.add(node);
+			if(!visitor.visit(ctx.f()).isEmpty()) res.add(node);
 		}
 		return res; 
 	}
 	
-	public List<Node> visitFilterIS(XPathParser.FilterISContext ctx) { 
+	public List<Node> evalFilterIS(XPathParser.FilterISContext ctx) { 
 		List<Node> leftRes,rightRes,tmp = new ArrayList<Node>();
 		List<Node> res = new ArrayList<Node>();
 		tmp.addAll(curList);
-		leftRes = this.visit(ctx.left);
+		leftRes = visitor.visit(ctx.left);
 		curList.clear();
 		curList.addAll(tmp);
-		rightRes = this.visit(ctx.right);
-		//Collections.sort((List<Node>) leftRes);
+		rightRes = visitor.visit(ctx.right);
 		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
 		for (Node node1:leftRes){
 			for (Node node2:rightRes){
@@ -234,34 +214,30 @@ public class xpathEvaluator{
 		return res; 
 	}
 	
-	public List<Node> visitFilterPara(XPathParser.FilterParaContext ctx) { 
-		return visit(ctx.f()); 
+	public List<Node> evalFilterPara(XPathParser.FilterParaContext ctx) { 
+		return visitor.visit(ctx.f()); 
 	}
 	
-	public List<Node> visitFilterRP(XPathParser.FilterRPContext ctx) { 
-		return visit(ctx.rp()); 
+	public List<Node> evalFilterRP(XPathParser.FilterRPContext ctx) { 
+		return visitor.visit(ctx.rp()); 
 	}
 	
-	public List<Node> visitFilterNOT(XPathParser.FilterNOTContext ctx) {
+	public List<Node> evalFilterNOT(XPathParser.FilterNOTContext ctx) {
 		List<Node> res = new ArrayList<Node>();
-		List<Node> tmp = visit(ctx.f());
+		List<Node> tmp = visitor.visit(ctx.f());
 		if (tmp.isEmpty())
 			res.add(null);
 		return res; 
 	}
 	
-	public List<Node> visitFilterEQ(XPathParser.FilterEQContext ctx) { 
+	public List<Node> evalFilterEQ(XPathParser.FilterEQContext ctx) { 
 		List<Node> leftRes,rightRes,tmp = new ArrayList<Node>();
 		List<Node> res = new ArrayList<Node>();
 		tmp.addAll(curList);
-		leftRes = this.visit(ctx.left);
+		leftRes = visitor.visit(ctx.left);
 		curList.clear();
 		curList.addAll(tmp);
-		rightRes = this.visit(ctx.right);
-		//System.out.println(leftRes);
-		//System.out.println(curList);
-		//System.out.println(rightRes);
-		//Collections.sort((List<Node>) leftRes);
+		rightRes = visitor.visit(ctx.right);
 		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
 		for (Node node1:leftRes){
 			for (Node node2:rightRes){
@@ -272,26 +248,27 @@ public class xpathEvaluator{
 		return res; 
 	}
 	
-	public List<Node> visitFilterOR(XPathParser.FilterORContext ctx) { 
+	public List<Node> evalFilterOR(XPathParser.FilterORContext ctx) { 
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = new ArrayList<Node>();
 		tmp.addAll(curList);
-		List<Node> left = visit(ctx.leftF);
+		List<Node> left = visitor.visit(ctx.leftF);
 		curList.clear();
 		curList.addAll(tmp);
-		List<Node> right = visit(ctx.rightF);
+		List<Node> right = visitor.visit(ctx.rightF);
 		if (!left.isEmpty() || !right.isEmpty()) res.add(null);
 		return res;
 	}
 	
-	public List<Node> visitFilterAND(XPathParser.FilterANDContext ctx) { 
+	
+	public List<Node> evalFilterAND(XPathParser.FilterANDContext ctx) { 
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = new ArrayList<Node>();
 		tmp.addAll(curList);
-		List<Node> left = visit(ctx.leftF);
+		List<Node> left = visitor.visit(ctx.leftF);
 		curList.clear();
 		curList.addAll(tmp);
-		List<Node> right = visit(ctx.rightF);
+		List<Node> right = visitor.visit(ctx.rightF);
 		if (!left.isEmpty() && !right.isEmpty()) res.add(null);
 		return res;
 	}

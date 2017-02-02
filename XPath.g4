@@ -3,6 +3,7 @@
  */
 grammar XPath;
 
+
 ap :
 'doc(\''fileName'\'")/'rp    #apSL
 |'doc("'fileName'")/'rp    #apSL
@@ -17,11 +18,11 @@ tagName 	 #rpTAG
 | '..' 		 #rpDDOT
 | '*'        #rpSTAR
 | 'text()'   #rpTEXT
-| '('rp')'   #rpPARA
-| left=rp'/'right=rp 	 #rpSL
-| left=rp'//'right=rp 	 #rpDSL
-| rp'['f']'  #rpF
-| left=rp','right=rp 	 #rpCOMMA
+| '(' rp ')'   #rpPARA
+| left=rp '/' right=rp 	 #rpSL
+| left=rp '//' right=rp 	 #rpDSL
+| rp '[' f ']'  #rpF
+| left=rp ',' right=rp 	 #rpCOMMA
 ;
 
 f:
@@ -39,8 +40,6 @@ tagName : NAME;
 attName : NAME;
 
 fileName : FILENAME;
-
-WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
  
 /*
  * OPERATIONS
@@ -58,5 +57,7 @@ NOT : 'not';
   */
 //LETTER : [a-zA-Z_];
 //LETTERANDDIGIT : [a-zA-Z0-9_-];
+FILENAME : [a-zA-Z0-9/._]+'.xml';
 NAME : [a-zA-Z_] [a-zA-Z0-9_]*;
-FILENAME : [a-zA-Z0-9/_]+'.xml';
+
+WS : [ \t\r\n]+ -> skip ;  // skip spaces, tabs, newlines
