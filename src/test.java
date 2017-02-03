@@ -69,7 +69,6 @@ import org.w3c.dom.Node;
     	        
     	}
     	
-    	
         public static void main( String[] args) throws Exception 
         {
         	String testcase = "doc(\"./src/j_caesar.xml\")//ACT[./TITLE]/*/SPEECH/../TITLE";
