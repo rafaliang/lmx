@@ -30,18 +30,22 @@ import org.w3c.dom.Node;
     			Document document = builder.newDocument();
     			Element tmp = document.createElement("result");
     			for (Node node:lst){
+    				if (node==null) continue;
+    				// attribute node
     				if (node.getNodeType()==2){
     					Node imported = document.importNode(node, true);
     					Element ele = document.createElement("Attribute");
     					ele.setAttributeNodeNS((Attr)imported);
     					tmp.appendChild(ele);
     				}
+    				// text node
     				else if (node.getNodeType()==3){
     					Node imported = document.importNode(node, true);
     					Element ele = document.createElement("TEXT");
     					ele.appendChild(imported);
     					tmp.appendChild(ele);
     				}
+    				// document node
     				else if (node.getNodeType()==9){
     					//System.out.println("doc");
     					TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -67,7 +71,7 @@ import org.w3c.dom.Node;
     	
         public static void main( String[] args) throws Exception 
         {
-        	String testcase = "doc(\"./src/a.xml\")//actor/@id";
+        	String testcase = "doc(\"./src/j_caesar.xml\")//ACT[./TITLE]/*/SPEECH/../TITLE";
             //ANTLRInputStream input = new ANTLRInputStream( System.in);
         	ANTLRInputStream input = new ANTLRInputStream( testcase);
             XPathLexer lexer = new XPathLexer(input);

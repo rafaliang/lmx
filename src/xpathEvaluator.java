@@ -75,6 +75,7 @@ public class xpathEvaluator{
 	private List<Node> getParents(List<Node> lst){
 		List<Node> res = new ArrayList<Node>();
 		for (Node node:lst){
+			if (node==null) continue;
 			if (node.getNodeType()==2){
 				res.add(((Attr)node).getOwnerElement());
 			}
@@ -85,8 +86,13 @@ public class xpathEvaluator{
 	
 	private List<Node> removeDup(List<Node> lst){
 		List<Node> res = new ArrayList<Node>();
-		HashSet<Node> h = new HashSet<Node>(lst);
-		res.addAll(h);
+		HashSet<Node> h = new HashSet<Node>();
+		for (Node node:lst){
+			if (!h.contains(node)){
+				res.add(node);
+				h.add(node);
+			}
+		}
 		return res;
 	}
 	

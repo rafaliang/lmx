@@ -46,7 +46,6 @@ public class xpVisitor extends XPathBaseVisitor<List<Node>>{
 	}
 	
 	public List<Node> visitRpSL(XPathParser.RpSLContext ctx) {
-		xpEvaluator.evalRpSL(ctx);
 		return xpEvaluator.evalRpSL(ctx);
 	}
 	
