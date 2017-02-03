@@ -156,7 +156,8 @@ public class xpathEvaluator{
 	}
 	
 	public List<Node> evalRpDOT(XPathParser.RpDOTContext ctx) {
-		return curList;
+		List<Node> res = new ArrayList<Node>(curList);
+		return res;
 	}
 	
 	public List<Node> evalRpDDOT(XPathParser.RpDDOTContext ctx) {
@@ -193,7 +194,8 @@ public class xpathEvaluator{
 	}
 	
 	public List<Node> evalRpF(XPathParser.RpFContext ctx) {
-		List<Node> tmp = visitor.visit(ctx.rp());
+		List<Node> tmp = new ArrayList<Node>();
+		tmp = visitor.visit(ctx.rp());
 		List<Node> res = new ArrayList<Node>();
 		for (Node node:tmp){
 			curList.clear();
@@ -248,7 +250,6 @@ public class xpathEvaluator{
 		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
 		for (Node node1:leftRes){
 			for (Node node2:rightRes){
-				//if (node1.getNodeValue().equals(node2.getNodeValue()))
 				if (node1.isEqualNode(node2))
 					return leftRes;
 			}
