@@ -18,9 +18,11 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import value.QList;
     public class test 
     {
-    	private static void write2xml(List<Node> lst){
+    	private static void write2xml(QList lst){
     		
     		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder;
@@ -72,7 +74,7 @@ import org.w3c.dom.Node;
         public static void main( String[] args) throws Exception 
         {
         	
-        	String testcase = "doc(\"./src/a.xml\")//actor/../..//singer/@id";
+        	String testcase = "doc(\"./src/a.xml\")//actor[(@id=./../..//singer/@id) or not(@id=./../..//singer/@id)]";
             //ANTLRInputStream input = new ANTLRInputStream( System.in);
         	//String testcase = "for $id in \"ids\" return $id";
         	ANTLRInputStream input = new ANTLRInputStream( testcase);
@@ -86,7 +88,7 @@ import org.w3c.dom.Node;
             
             
             xpVisitor xpVisitor = new xpVisitor();
-            List<Node> res = xpVisitor.visit(tree);
+            QList res = (QList) xpVisitor.visit(tree);
             write2xml(res);
             
             

@@ -15,6 +15,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.*;
 
+import value.QList;
+
 import javax.xml.parsers.DocumentBuilder;   
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -30,17 +32,17 @@ import org.w3c.dom.NodeList;
 
 public class xpathEvaluator{
 	
-	protected Stack<List<Node>> nodelstSt;
+	protected Stack<QList> nodelstSt;
 	protected xpVisitor visitor;
 	
-	xpathEvaluator(xpVisitor visitor, Stack<List<Node>> nodelstSt){
+	xpathEvaluator(xpVisitor visitor, Stack<QList> nodelstSt){
 		this.visitor=visitor;
 		this.nodelstSt=nodelstSt;
 		
 	}
-	
-	private List<Node> getDescedants(List<Node> lst){
-		List<Node> res = new ArrayList<Node>();
+	/*
+	private QList getDescedants(QList lst){
+		QList res = new QList();
 		Queue<Node> nodeSt = new LinkedBlockingQueue<Node>();
 		Node node;
 		NodeList nl;
@@ -59,8 +61,8 @@ public class xpathEvaluator{
 		return this.removeDup(res);
 	}
 	
-	private List<Node> getChildren(List<Node> lst){
-		List<Node> res = new ArrayList<Node>();
+	private QList getChildren(QList lst){
+		QList res = new QList();
 		NodeList nl;
 		for (Node node:lst){
 			nl=node.getChildNodes();
@@ -72,8 +74,8 @@ public class xpathEvaluator{
 		return res;
 	}
 	
-	private List<Node> getParents(List<Node> lst){
-		List<Node> res = new ArrayList<Node>();
+	private QList getParents(QList lst){
+		QList res = new QList();
 		for (Node node:lst){
 			if (node==null) continue;
 			if (node.getNodeType()==2){
@@ -84,8 +86,8 @@ public class xpathEvaluator{
 		return this.removeDup(res);
 	}
 	
-	private List<Node> removeDup(List<Node> lst){
-		List<Node> res = new ArrayList<Node>();
+	private QList removeDup(QList lst){
+		QList res = new QList();
 		HashSet<Node> h = new HashSet<Node>();
 		for (Node node:lst){
 			if (!h.contains(node)){
@@ -95,7 +97,7 @@ public class xpathEvaluator{
 		}
 		return res;
 	}
-	
+	*/
 	private Node readXML(String fileName){
 		Document doc = null;
 		try{
@@ -108,45 +110,45 @@ public class xpathEvaluator{
 		return doc;
 	}
 	
-	public List<Node> evalApSL(XQueryParser.ApSLContext ctx){
-		List<Node> lst = new ArrayList<Node>();
+	public QList evalApSL(XQueryParser.ApSLContext ctx){
+		QList lst = new QList();
 		String xmlFile = ctx.fileName().getText();
 		lst.add(this.readXML(xmlFile));
 		nodelstSt.push(lst);
-		lst = visitor.visit(ctx.rp());
+		lst = (QList) visitor.visit(ctx.rp());
 		nodelstSt.pop();
 		return lst;
 	}
 	
-	public List<Node> evalApDSL(XQueryParser.ApDSLContext ctx){
-		List<Node> lst = new ArrayList<Node>();
+	public QList evalApDSL(XQueryParser.ApDSLContext ctx){
+		QList lst = new QList();
 		String xmlFile = ctx.fileName().getText();
 		lst.add(this.readXML(xmlFile));
-		lst = this.getDescedants(lst);
+		lst = lst.getDescedants();
 		nodelstSt.push(lst);
-		return visitor.visit(ctx.rp());
+		return (QList) visitor.visit(ctx.rp());
 		
 	}
 	
-	public List<Node> evalRpSL(XQueryParser.RpSLContext ctx) {
-		nodelstSt.push(visitor.visit(ctx.left));
-		List<Node> lst =  visitor.visit(ctx.right);
+	public QList evalRpSL(XQueryParser.RpSLContext ctx) {
+		nodelstSt.push((QList)visitor.visit(ctx.left));
+		QList lst =  (QList) visitor.visit(ctx.right);
 		nodelstSt.pop();
 		return lst;
 	}
 	
-	public List<Node> evalRpDSL(XQueryParser.RpDSLContext ctx) {
-		List<Node> lst = visitor.visit(ctx.left);
-		nodelstSt.push(this.getDescedants(lst));
-		lst =  visitor.visit(ctx.right);
+	public QList evalRpDSL(XQueryParser.RpDSLContext ctx) {
+		QList lst = (QList) visitor.visit(ctx.left);
+		nodelstSt.push(lst.getDescedants());
+		lst =  (QList) visitor.visit(ctx.right);
 		nodelstSt.pop();
 		return lst;
 	}
 	
-	public List<Node> evalRpTAG(XQueryParser.RpTAGContext ctx) {
-		List<Node> res = new ArrayList<Node>();
-		//List<Node> lst = nodelstSt.peek();
-		List<Node> candidate = this.getChildren(nodelstSt.peek());
+	public QList evalRpTAG(XQueryParser.RpTAGContext ctx) {
+		QList res = new QList();
+		//QList lst = nodelstSt.peek();
+		QList candidate = nodelstSt.peek().getChildren();
 		for (int i=0;i<candidate.size();++i){
 			if (candidate.get(i).getNodeName().equals(ctx.getText()))
 				res.add(candidate.get(i));
@@ -155,9 +157,9 @@ public class xpathEvaluator{
 		return res;
 	}
 	
-	public List<Node> evalRpATT(XQueryParser.RpATTContext ctx) {
-		List<Node> res = new ArrayList<Node>();
-		List<Node> lst = nodelstSt.peek();
+	public QList evalRpATT(XQueryParser.RpATTContext ctx) {
+		QList res = new QList();
+		QList lst = nodelstSt.peek();
 		for (int i=0;i<lst.size();++i){
 			Node node = lst.get(i);
 			NamedNodeMap nnm = node.getAttributes();
@@ -169,17 +171,17 @@ public class xpathEvaluator{
 		return res;
 	}
 	
-	public List<Node> evalRpDOT(XQueryParser.RpDOTContext ctx) {
-		//List<Node> res = new ArrayList<Node>(curList);
+	public QList evalRpDOT(XQueryParser.RpDOTContext ctx) {
+		//QList res = new QList(curList);
 		return nodelstSt.peek();
 	}
 	
-	public List<Node> evalRpDDOT(XQueryParser.RpDDOTContext ctx) {
-		return this.getParents(nodelstSt.peek());
+	public QList evalRpDDOT(XQueryParser.RpDDOTContext ctx) {
+		return nodelstSt.peek().getParents();
 	}
 	
-	public List<Node> evalRpTEXT(XQueryParser.RpTEXTContext ctx) {
-		List<Node> res = new ArrayList<Node>();
+	public QList evalRpTEXT(XQueryParser.RpTEXTContext ctx) {
+		QList res = new QList();
 		for (Node node:nodelstSt.peek()){
 			Node n = node.getChildNodes().item(0);
 			if (n.getNodeType()==3)
@@ -188,92 +190,79 @@ public class xpathEvaluator{
 		return res; 
 	}
 	
-	public List<Node> evalRpPARA(XQueryParser.RpPARAContext ctx) {
-		return visitor.visit(ctx.rp()); 
+	public QList evalRpPARA(XQueryParser.RpPARAContext ctx) {
+		return (QList) visitor.visit(ctx.rp()); 
 	}
 	
-	public List<Node> evalRpSTAR(XQueryParser.RpSTARContext ctx) { 
-		return this.getChildren(nodelstSt.peek()); 
+	public QList evalRpSTAR(XQueryParser.RpSTARContext ctx) { 
+		return nodelstSt.peek().getChildren(); 
 	}
 	
-	public List<Node> evalRpCOMMA(XQueryParser.RpCOMMAContext ctx) { 
-		List<Node> lst1 = visitor.visit(ctx.left);
-		List<Node> lst2 = visitor.visit(ctx.right);
+	public QList evalRpCOMMA(XQueryParser.RpCOMMAContext ctx) { 
+		QList lst1 = (QList) visitor.visit(ctx.left);
+		QList lst2 = (QList) visitor.visit(ctx.right);
 		lst1.addAll(lst2);
 		return lst1;
 	}
 	
-	public List<Node> evalRpF(XQueryParser.RpFContext ctx) {
-		List<Node> tmp = new ArrayList<Node>();
-		List<Node> lst = visitor.visit(ctx.rp());
-		List<Node> res = new ArrayList<Node>();
+	public QList evalRpF(XQueryParser.RpFContext ctx) {
+		QList lst = (QList) visitor.visit(ctx.rp());
+		QList res = new QList();
 		for (Node node:lst){
-			tmp.clear();
-			tmp.add(node);
+			QList tmp = new QList(node);
 			nodelstSt.push(tmp);
-			if(!visitor.visit(ctx.f()).isEmpty()) res.add(node);
+			if(!((QList)visitor.visit(ctx.f())).isEmpty()) res.add(node);
+			nodelstSt.pop();
 		}
 		return res; 
 	}
 	
-	public List<Node> evalFilterIS(XQueryParser.FilterISContext ctx) { 
-		List<Node> leftRes = visitor.visit(ctx.left);
-		List<Node> rightRes = visitor.visit(ctx.right);
-		List<Node> res = new ArrayList<Node>();
-		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
-		for (Node node1:leftRes){
-			for (Node node2:rightRes){
-				if (node1.isSameNode(node2))
-					return leftRes;
-			}
-		}
-		return res; 
+	public QList evalFilterIS(XQueryParser.FilterISContext ctx) { 
+		QList leftRes = (QList) visitor.visit(ctx.left);
+		QList rightRes = (QList) visitor.visit(ctx.right);
+		QList res = new QList();
+		if (leftRes.is(rightRes)) return leftRes;
+		else return res; 
 	}
 	
-	public List<Node> evalFilterPara(XQueryParser.FilterParaContext ctx) { 
-		return visitor.visit(ctx.f()); 
+	public QList evalFilterPara(XQueryParser.FilterParaContext ctx) { 
+		return (QList) visitor.visit(ctx.f()); 
 	}
 	
-	public List<Node> evalFilterRP(XQueryParser.FilterRPContext ctx) { 
-		return visitor.visit(ctx.rp()); 
+	public QList evalFilterRP(XQueryParser.FilterRPContext ctx) { 
+		return (QList) visitor.visit(ctx.rp()); 
 	}
 	
-	public List<Node> evalFilterNOT(XQueryParser.FilterNOTContext ctx) {
-		List<Node> res = new ArrayList<Node>();
-		List<Node> tmp = visitor.visit(ctx.f());
+	public QList evalFilterNOT(XQueryParser.FilterNOTContext ctx) {
+		QList res = new QList();
+		QList tmp = (QList) visitor.visit(ctx.f());
 		if (tmp.isEmpty())
 			res.add(null);
 		return res; 
 	}
 	
-	public List<Node> evalFilterEQ(XQueryParser.FilterEQContext ctx) { 
-		List<Node> leftRes = visitor.visit(ctx.left);
-		List<Node> rightRes = visitor.visit(ctx.right);
-		List<Node> res = new ArrayList<Node>();
-		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
-		for (Node node1:leftRes){
-			for (Node node2:rightRes){
-				if (node1.isEqualNode(node2))
-					return leftRes;
-			}
-		}
-		return res; 
+	public QList evalFilterEQ(XQueryParser.FilterEQContext ctx) { 
+		QList leftRes = (QList) visitor.visit(ctx.left);
+		QList rightRes = (QList) visitor.visit(ctx.right);
+		QList res = new QList();
+		if (leftRes.eq(rightRes)) return leftRes;
+		else return res;
 	}
 	
-	public List<Node> evalFilterOR(XQueryParser.FilterORContext ctx) { 
-		List<Node> leftRes = visitor.visit(ctx.leftF);
-		List<Node> rightRes = visitor.visit(ctx.rightF);
-		List<Node> res = new ArrayList<Node>();
-		if (!leftRes.isEmpty() || !rightRes.isEmpty()) res.add(null);
+	public QList evalFilterOR(XQueryParser.FilterORContext ctx) { 
+		QList leftRes = (QList) visitor.visit(ctx.leftF);
+		QList rightRes = (QList) visitor.visit(ctx.rightF);
+		QList res = new QList();
+		if (leftRes.or(rightRes)) res.add(null);
 		return res;
 	}
 	
 	
-	public List<Node> evalFilterAND(XQueryParser.FilterANDContext ctx) { 
-		List<Node> leftRes = visitor.visit(ctx.leftF);
-		List<Node> rightRes = visitor.visit(ctx.rightF);
-		List<Node> res = new ArrayList<Node>();
-		if (!leftRes.isEmpty() && !rightRes.isEmpty()) res.add(null);
+	public QList evalFilterAND(XQueryParser.FilterANDContext ctx) { 
+		QList leftRes = (QList) visitor.visit(ctx.leftF);
+		QList rightRes = (QList) visitor.visit(ctx.rightF);
+		QList res = new QList();
+		if (leftRes.and(rightRes)) res.add(null);
 		return res;
 	}
 	
