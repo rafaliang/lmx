@@ -30,16 +30,13 @@ import org.w3c.dom.NodeList;
 
 public class xqueryEvaluator{
 	protected xpVisitor visitor;
-	protected List<Node> curList;
+	protected Stack<List<Node>> nodelstSt;
 	
-	xqueryEvaluator(xpVisitor visitor, List<Node> lst)
+	xqueryEvaluator(xpVisitor visitor, Stack<List<Node>> nodelstSt)
 	{
 		this.visitor = visitor;
-		this.curList = lst;
+		this.nodelstSt = nodelstSt;
 	}
 	
-	public void test(){
-		System.out.println(curList);
-		curList.clear();
-	}
+	
 }

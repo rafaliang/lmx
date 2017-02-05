@@ -30,12 +30,12 @@ import org.w3c.dom.NodeList;
 
 public class xpathEvaluator{
 	
-	protected List<Node> curList;
+	protected Stack<List<Node>> nodelstSt;
 	protected xpVisitor visitor;
 	
-	xpathEvaluator(xpVisitor visitor, List<Node> curList){
+	xpathEvaluator(xpVisitor visitor, Stack<List<Node>> nodelstSt){
 		this.visitor=visitor;
-		this.curList=curList;
+		this.nodelstSt=nodelstSt;
 		
 	}
 	
@@ -109,43 +109,57 @@ public class xpathEvaluator{
 	}
 	
 	public List<Node> evalApSL(XQueryParser.ApSLContext ctx){
+		List<Node> lst = new ArrayList<Node>();
 		String xmlFile = ctx.fileName().getText();
-		curList.add(this.readXML(xmlFile));
-		return visitor.visit(ctx.rp());
+		lst.add(this.readXML(xmlFile));
+		nodelstSt.push(lst);
+		lst = visitor.visit(ctx.rp());
+		nodelstSt.pop();
+		return lst;
 	}
 	
 	public List<Node> evalApDSL(XQueryParser.ApDSLContext ctx){
+		List<Node> lst = new ArrayList<Node>();
 		String xmlFile = ctx.fileName().getText();
-		curList.add(this.readXML(xmlFile));
-		curList = this.getDescedants(curList);
+		lst.add(this.readXML(xmlFile));
+		lst = this.getDescedants(lst);
+		nodelstSt.push(lst);
 		return visitor.visit(ctx.rp());
+		
 	}
 	
 	public List<Node> evalRpSL(XQueryParser.RpSLContext ctx) {
-		curList = visitor.visit(ctx.left);
-		return visitor.visit(ctx.right);
+		nodelstSt.push(visitor.visit(ctx.left));
+		List<Node> lst =  visitor.visit(ctx.right);
+		nodelstSt.pop();
+		return lst;
 	}
 	
 	public List<Node> evalRpDSL(XQueryParser.RpDSLContext ctx) {
-		curList = visitor.visit(ctx.left);
-		curList = this.getDescedants(curList);
-		return visitor.visit(ctx.right);
+		List<Node> lst = visitor.visit(ctx.left);
+		nodelstSt.push(this.getDescedants(lst));
+		lst =  visitor.visit(ctx.right);
+		nodelstSt.pop();
+		return lst;
 	}
 	
 	public List<Node> evalRpTAG(XQueryParser.RpTAGContext ctx) {
 		List<Node> res = new ArrayList<Node>();
-		List<Node> candidate = this.getChildren(curList);
+		//List<Node> lst = nodelstSt.peek();
+		List<Node> candidate = this.getChildren(nodelstSt.peek());
 		for (int i=0;i<candidate.size();++i){
 			if (candidate.get(i).getNodeName().equals(ctx.getText()))
 				res.add(candidate.get(i));
 		}
+		//nodelstSt.push(res);
 		return res;
 	}
 	
 	public List<Node> evalRpATT(XQueryParser.RpATTContext ctx) {
 		List<Node> res = new ArrayList<Node>();
-		for (int i=0;i<curList.size();++i){
-			Node node = curList.get(i);
+		List<Node> lst = nodelstSt.peek();
+		for (int i=0;i<lst.size();++i){
+			Node node = lst.get(i);
 			NamedNodeMap nnm = node.getAttributes();
 			for (int j=0;j<nnm.getLength();++j){
 				if (nnm.item(j).getNodeName().equals(ctx.getText().substring(1)))
@@ -156,17 +170,17 @@ public class xpathEvaluator{
 	}
 	
 	public List<Node> evalRpDOT(XQueryParser.RpDOTContext ctx) {
-		List<Node> res = new ArrayList<Node>(curList);
-		return res;
+		//List<Node> res = new ArrayList<Node>(curList);
+		return nodelstSt.peek();
 	}
 	
 	public List<Node> evalRpDDOT(XQueryParser.RpDDOTContext ctx) {
-		return getParents(curList);
+		return this.getParents(nodelstSt.peek());
 	}
 	
 	public List<Node> evalRpTEXT(XQueryParser.RpTEXTContext ctx) {
 		List<Node> res = new ArrayList<Node>();
-		for (Node node:curList){
+		for (Node node:nodelstSt.peek()){
 			Node n = node.getChildNodes().item(0);
 			if (n.getNodeType()==3)
 				res.add(n);
@@ -179,40 +193,33 @@ public class xpathEvaluator{
 	}
 	
 	public List<Node> evalRpSTAR(XQueryParser.RpSTARContext ctx) { 
-		return this.getChildren(curList); 
+		return this.getChildren(nodelstSt.peek()); 
 	}
 	
 	public List<Node> evalRpCOMMA(XQueryParser.RpCOMMAContext ctx) { 
-		List<Node> res = new ArrayList<Node>();
-		List<Node> tmp = new ArrayList<Node>();
-		tmp.addAll(curList);
-		res.addAll(visitor.visit(ctx.left));
-		curList.clear();
-		curList.addAll(tmp);
-		res.addAll(visitor.visit(ctx.right));
-		return res; 
+		List<Node> lst1 = visitor.visit(ctx.left);
+		List<Node> lst2 = visitor.visit(ctx.right);
+		lst1.addAll(lst2);
+		return lst1;
 	}
 	
 	public List<Node> evalRpF(XQueryParser.RpFContext ctx) {
 		List<Node> tmp = new ArrayList<Node>();
-		tmp = visitor.visit(ctx.rp());
+		List<Node> lst = visitor.visit(ctx.rp());
 		List<Node> res = new ArrayList<Node>();
-		for (Node node:tmp){
-			curList.clear();
-			curList.add(node);
+		for (Node node:lst){
+			tmp.clear();
+			tmp.add(node);
+			nodelstSt.push(tmp);
 			if(!visitor.visit(ctx.f()).isEmpty()) res.add(node);
 		}
 		return res; 
 	}
 	
 	public List<Node> evalFilterIS(XQueryParser.FilterISContext ctx) { 
-		List<Node> leftRes,rightRes,tmp = new ArrayList<Node>();
+		List<Node> leftRes = visitor.visit(ctx.left);
+		List<Node> rightRes = visitor.visit(ctx.right);
 		List<Node> res = new ArrayList<Node>();
-		tmp.addAll(curList);
-		leftRes = visitor.visit(ctx.left);
-		curList.clear();
-		curList.addAll(tmp);
-		rightRes = visitor.visit(ctx.right);
 		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
 		for (Node node1:leftRes){
 			for (Node node2:rightRes){
@@ -240,13 +247,9 @@ public class xpathEvaluator{
 	}
 	
 	public List<Node> evalFilterEQ(XQueryParser.FilterEQContext ctx) { 
-		List<Node> leftRes,rightRes,tmp = new ArrayList<Node>();
+		List<Node> leftRes = visitor.visit(ctx.left);
+		List<Node> rightRes = visitor.visit(ctx.right);
 		List<Node> res = new ArrayList<Node>();
-		tmp.addAll(curList);
-		leftRes = visitor.visit(ctx.left);
-		curList.clear();
-		curList.addAll(tmp);
-		rightRes = visitor.visit(ctx.right);
 		if (leftRes.isEmpty() || rightRes.isEmpty()) return res;
 		for (Node node1:leftRes){
 			for (Node node2:rightRes){
@@ -258,27 +261,19 @@ public class xpathEvaluator{
 	}
 	
 	public List<Node> evalFilterOR(XQueryParser.FilterORContext ctx) { 
+		List<Node> leftRes = visitor.visit(ctx.leftF);
+		List<Node> rightRes = visitor.visit(ctx.rightF);
 		List<Node> res = new ArrayList<Node>();
-		List<Node> tmp = new ArrayList<Node>();
-		tmp.addAll(curList);
-		List<Node> left = visitor.visit(ctx.leftF);
-		curList.clear();
-		curList.addAll(tmp);
-		List<Node> right = visitor.visit(ctx.rightF);
-		if (!left.isEmpty() || !right.isEmpty()) res.add(null);
+		if (!leftRes.isEmpty() || !rightRes.isEmpty()) res.add(null);
 		return res;
 	}
 	
 	
 	public List<Node> evalFilterAND(XQueryParser.FilterANDContext ctx) { 
+		List<Node> leftRes = visitor.visit(ctx.leftF);
+		List<Node> rightRes = visitor.visit(ctx.rightF);
 		List<Node> res = new ArrayList<Node>();
-		List<Node> tmp = new ArrayList<Node>();
-		tmp.addAll(curList);
-		List<Node> left = visitor.visit(ctx.leftF);
-		curList.clear();
-		curList.addAll(tmp);
-		List<Node> right = visitor.visit(ctx.rightF);
-		if (!left.isEmpty() && !right.isEmpty()) res.add(null);
+		if (!leftRes.isEmpty() && !rightRes.isEmpty()) res.add(null);
 		return res;
 	}
 	

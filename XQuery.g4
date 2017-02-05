@@ -4,16 +4,16 @@
 grammar XQuery;
 
 xq:
-Var
-| StringConstant
-| ap
-| '(' xq ')'
-| left=xq ',' right=xq
-| xq '/' rp
-| xq '//' rp
-| '<'leftT=tagName'>' '{'xq'}' '</'rightT=tagName'>'
-| forClause letClause? whereClause? returnClause
-| letClause xq
+Var #xqVAR
+| StringConstant #xqString
+| ap #xqAP
+| '(' xq ')' #xqPARA
+| left=xq ',' right=xq #xqComma
+| xq '/' rp #xqSL
+| xq '//' rp #xqDSL
+| '<'leftT=tagName'>' '{'xq'}' '</'rightT=tagName'>' #xqTAG
+| forClause letClause? whereClause? returnClause #xqFOR
+| letClause xq #xqLET
 ;
 
 forClause:
@@ -33,14 +33,14 @@ returnClause:
 ;
 
 cond:
-left=xq EQ right=xq
-| left=xq IS right=xq
-| 'empty(' xq ')'
-| 'some' Var 'in' xq (',' Var 'in' xq)* 'satisfies' cond
-| '(' cond ')'
-| leftCond=cond AND rightCond=cond
-| leftCond=cond OR rightCond=cond
-| NOT cond
+left=xq EQ right=xq  #condEQ
+| left=xq IS right=xq #condIS
+| 'empty(' xq ')' #condEMPTY
+| 'some' Var 'in' xq (',' Var 'in' xq)* 'satisfies' cond #condSATISFY
+| '(' cond ')' #condPARA
+| leftCond=cond AND rightCond=cond #condAND
+| leftCond=cond OR rightCond=cond #condOR
+| NOT cond #condNOT
 ;
 
 ap :

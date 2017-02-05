@@ -27,14 +27,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList; 
 
 public class xpVisitor extends XQueryBaseVisitor<List<Node>>{
-	private List<Node> curList;
+	private Stack<List<Node>> nodelstSt;
 	private xpathEvaluator xpEvaluator;
 	private xqueryEvaluator xqEvaluator;
 	
 	xpVisitor(){
-		curList = new ArrayList<Node>();
-		xpEvaluator = new xpathEvaluator(this,curList);
-		xqEvaluator = new xqueryEvaluator(this,curList);
+		nodelstSt = new Stack<List<Node>>();
+		xpEvaluator = new xpathEvaluator(this,nodelstSt);
+		xqEvaluator = new xqueryEvaluator(this,nodelstSt);
 	}
 	
 	public List<Node> visitApSL(XQueryParser.ApSLContext ctx){
