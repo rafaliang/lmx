@@ -71,20 +71,29 @@ import org.w3c.dom.Node;
     	
         public static void main( String[] args) throws Exception 
         {
-        	String testcase = "doc(\"./src/j_caesar.xml\")//ACT//SPEECH/../../*/../TITLE";
+        	
+        	//String testcase = "doc(\"./src/j_caesar.xml\")//ACT//SPEECH/../../*/../TITLE";
             //ANTLRInputStream input = new ANTLRInputStream( System.in);
+        	String testcase = "for $id in \"ids\" return $id";
         	ANTLRInputStream input = new ANTLRInputStream( testcase);
-            XPathLexer lexer = new XPathLexer(input);
-
+            XQueryLexer lexer = new XQueryLexer(input);
+            
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-            XPathParser parser = new XPathParser(tokens);
-            ParseTree tree = parser.ap(); // begin parsing at rule 'exp'
-            //ParseTreeWalker walker = new ParseTreeWalker();
+            
+            XQueryParser parser = new XQueryParser(tokens);
+            //ParseTree tree = parser.ap(); // begin parsing at rule 'ap'
+            ParseTree tree = parser.xq();
+            
+            /*
             xpVisitor xpVisitor = new xpVisitor();
             List<Node> res = xpVisitor.visit(tree);
             write2xml(res);
+            */
+            
             System.out.println(tree.toStringTree(parser)); // print LISP-style tree
+            
+            
+            
         }
         
     }

@@ -108,31 +108,31 @@ public class xpathEvaluator{
 		return doc;
 	}
 	
-	public List<Node> evalApSL(XPathParser.ApSLContext ctx){
+	public List<Node> evalApSL(XQueryParser.ApSLContext ctx){
 		String xmlFile = ctx.fileName().getText();
 		curList.add(this.readXML(xmlFile));
 		return visitor.visit(ctx.rp());
 	}
 	
-	public List<Node> evalApDSL(XPathParser.ApDSLContext ctx){
+	public List<Node> evalApDSL(XQueryParser.ApDSLContext ctx){
 		String xmlFile = ctx.fileName().getText();
 		curList.add(this.readXML(xmlFile));
 		curList = this.getDescedants(curList);
 		return visitor.visit(ctx.rp());
 	}
 	
-	public List<Node> evalRpSL(XPathParser.RpSLContext ctx) {
+	public List<Node> evalRpSL(XQueryParser.RpSLContext ctx) {
 		curList = visitor.visit(ctx.left);
 		return visitor.visit(ctx.right);
 	}
 	
-	public List<Node> evalRpDSL(XPathParser.RpDSLContext ctx) {
+	public List<Node> evalRpDSL(XQueryParser.RpDSLContext ctx) {
 		curList = visitor.visit(ctx.left);
 		curList = this.getDescedants(curList);
 		return visitor.visit(ctx.right);
 	}
 	
-	public List<Node> evalRpTAG(XPathParser.RpTAGContext ctx) {
+	public List<Node> evalRpTAG(XQueryParser.RpTAGContext ctx) {
 		List<Node> res = new ArrayList<Node>();
 		List<Node> candidate = this.getChildren(curList);
 		for (int i=0;i<candidate.size();++i){
@@ -142,7 +142,7 @@ public class xpathEvaluator{
 		return res;
 	}
 	
-	public List<Node> evalRpATT(XPathParser.RpATTContext ctx) {
+	public List<Node> evalRpATT(XQueryParser.RpATTContext ctx) {
 		List<Node> res = new ArrayList<Node>();
 		for (int i=0;i<curList.size();++i){
 			Node node = curList.get(i);
@@ -155,16 +155,16 @@ public class xpathEvaluator{
 		return res;
 	}
 	
-	public List<Node> evalRpDOT(XPathParser.RpDOTContext ctx) {
+	public List<Node> evalRpDOT(XQueryParser.RpDOTContext ctx) {
 		List<Node> res = new ArrayList<Node>(curList);
 		return res;
 	}
 	
-	public List<Node> evalRpDDOT(XPathParser.RpDDOTContext ctx) {
+	public List<Node> evalRpDDOT(XQueryParser.RpDDOTContext ctx) {
 		return getParents(curList);
 	}
 	
-	public List<Node> evalRpTEXT(XPathParser.RpTEXTContext ctx) {
+	public List<Node> evalRpTEXT(XQueryParser.RpTEXTContext ctx) {
 		List<Node> res = new ArrayList<Node>();
 		for (Node node:curList){
 			Node n = node.getChildNodes().item(0);
@@ -174,15 +174,15 @@ public class xpathEvaluator{
 		return res; 
 	}
 	
-	public List<Node> evalRpPARA(XPathParser.RpPARAContext ctx) {
+	public List<Node> evalRpPARA(XQueryParser.RpPARAContext ctx) {
 		return visitor.visit(ctx.rp()); 
 	}
 	
-	public List<Node> evalRpSTAR(XPathParser.RpSTARContext ctx) { 
+	public List<Node> evalRpSTAR(XQueryParser.RpSTARContext ctx) { 
 		return this.getChildren(curList); 
 	}
 	
-	public List<Node> evalRpCOMMA(XPathParser.RpCOMMAContext ctx) { 
+	public List<Node> evalRpCOMMA(XQueryParser.RpCOMMAContext ctx) { 
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = new ArrayList<Node>();
 		tmp.addAll(curList);
@@ -193,7 +193,7 @@ public class xpathEvaluator{
 		return res; 
 	}
 	
-	public List<Node> evalRpF(XPathParser.RpFContext ctx) {
+	public List<Node> evalRpF(XQueryParser.RpFContext ctx) {
 		List<Node> tmp = new ArrayList<Node>();
 		tmp = visitor.visit(ctx.rp());
 		List<Node> res = new ArrayList<Node>();
@@ -205,7 +205,7 @@ public class xpathEvaluator{
 		return res; 
 	}
 	
-	public List<Node> evalFilterIS(XPathParser.FilterISContext ctx) { 
+	public List<Node> evalFilterIS(XQueryParser.FilterISContext ctx) { 
 		List<Node> leftRes,rightRes,tmp = new ArrayList<Node>();
 		List<Node> res = new ArrayList<Node>();
 		tmp.addAll(curList);
@@ -223,15 +223,15 @@ public class xpathEvaluator{
 		return res; 
 	}
 	
-	public List<Node> evalFilterPara(XPathParser.FilterParaContext ctx) { 
+	public List<Node> evalFilterPara(XQueryParser.FilterParaContext ctx) { 
 		return visitor.visit(ctx.f()); 
 	}
 	
-	public List<Node> evalFilterRP(XPathParser.FilterRPContext ctx) { 
+	public List<Node> evalFilterRP(XQueryParser.FilterRPContext ctx) { 
 		return visitor.visit(ctx.rp()); 
 	}
 	
-	public List<Node> evalFilterNOT(XPathParser.FilterNOTContext ctx) {
+	public List<Node> evalFilterNOT(XQueryParser.FilterNOTContext ctx) {
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = visitor.visit(ctx.f());
 		if (tmp.isEmpty())
@@ -239,7 +239,7 @@ public class xpathEvaluator{
 		return res; 
 	}
 	
-	public List<Node> evalFilterEQ(XPathParser.FilterEQContext ctx) { 
+	public List<Node> evalFilterEQ(XQueryParser.FilterEQContext ctx) { 
 		List<Node> leftRes,rightRes,tmp = new ArrayList<Node>();
 		List<Node> res = new ArrayList<Node>();
 		tmp.addAll(curList);
@@ -257,7 +257,7 @@ public class xpathEvaluator{
 		return res; 
 	}
 	
-	public List<Node> evalFilterOR(XPathParser.FilterORContext ctx) { 
+	public List<Node> evalFilterOR(XQueryParser.FilterORContext ctx) { 
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = new ArrayList<Node>();
 		tmp.addAll(curList);
@@ -270,7 +270,7 @@ public class xpathEvaluator{
 	}
 	
 	
-	public List<Node> evalFilterAND(XPathParser.FilterANDContext ctx) { 
+	public List<Node> evalFilterAND(XQueryParser.FilterANDContext ctx) { 
 		List<Node> res = new ArrayList<Node>();
 		List<Node> tmp = new ArrayList<Node>();
 		tmp.addAll(curList);

@@ -26,7 +26,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node; 
 import org.w3c.dom.NodeList; 
 
-public class xpVisitor extends XPathBaseVisitor<List<Node>>{
+public class xpVisitor extends XQueryBaseVisitor<List<Node>>{
 	private List<Node> curList;
 	private xpathEvaluator xpEvaluator;
 	private xqueryEvaluator xqEvaluator;
@@ -37,83 +37,83 @@ public class xpVisitor extends XPathBaseVisitor<List<Node>>{
 		xqEvaluator = new xqueryEvaluator(this,curList);
 	}
 	
-	public List<Node> visitApSL(XPathParser.ApSLContext ctx){
+	public List<Node> visitApSL(XQueryParser.ApSLContext ctx){
 		return xpEvaluator.evalApSL(ctx);
 	}
 	
-	public List<Node> visitApDSL(XPathParser.ApDSLContext ctx){
+	public List<Node> visitApDSL(XQueryParser.ApDSLContext ctx){
 		return xpEvaluator.evalApDSL(ctx);
 	}
 	
-	public List<Node> visitRpSL(XPathParser.RpSLContext ctx) {
+	public List<Node> visitRpSL(XQueryParser.RpSLContext ctx) {
 		return xpEvaluator.evalRpSL(ctx);
 	}
 	
-	public List<Node> visitRpDSL(XPathParser.RpDSLContext ctx) {
+	public List<Node> visitRpDSL(XQueryParser.RpDSLContext ctx) {
 		return xpEvaluator.evalRpDSL(ctx);
 	}
 	
-	public List<Node> visitRpTAG(XPathParser.RpTAGContext ctx) {
+	public List<Node> visitRpTAG(XQueryParser.RpTAGContext ctx) {
 		return xpEvaluator.evalRpTAG(ctx);
 	}
 	
-	public List<Node> visitRpATT(XPathParser.RpATTContext ctx) {
+	public List<Node> visitRpATT(XQueryParser.RpATTContext ctx) {
 		return xpEvaluator.evalRpATT(ctx);
 	}
 	
-	public List<Node> visitRpDOT(XPathParser.RpDOTContext ctx) {
+	public List<Node> visitRpDOT(XQueryParser.RpDOTContext ctx) {
 		return xpEvaluator.evalRpDOT(ctx);
 	}
 	
-	public List<Node> visitRpDDOT(XPathParser.RpDDOTContext ctx) {
+	public List<Node> visitRpDDOT(XQueryParser.RpDDOTContext ctx) {
 		return xpEvaluator.evalRpDDOT(ctx);
 	}
 	
-	public List<Node> visitRpTEXT(XPathParser.RpTEXTContext ctx) {
+	public List<Node> visitRpTEXT(XQueryParser.RpTEXTContext ctx) {
 		return xpEvaluator.evalRpTEXT(ctx);
 	}
 	
-	public List<Node> visitRpPARA(XPathParser.RpPARAContext ctx) {
+	public List<Node> visitRpPARA(XQueryParser.RpPARAContext ctx) {
 		return xpEvaluator.evalRpPARA(ctx);
 	}
 	
-	public List<Node> visitRpSTAR(XPathParser.RpSTARContext ctx) { 
+	public List<Node> visitRpSTAR(XQueryParser.RpSTARContext ctx) { 
 		return xpEvaluator.evalRpSTAR(ctx);
 	}
 	
-	public List<Node> visitRpCOMMA(XPathParser.RpCOMMAContext ctx) { 
+	public List<Node> visitRpCOMMA(XQueryParser.RpCOMMAContext ctx) { 
 		return xpEvaluator.evalRpCOMMA(ctx);
 	}
 	
-	public List<Node> visitRpF(XPathParser.RpFContext ctx) {
+	public List<Node> visitRpF(XQueryParser.RpFContext ctx) {
 		return xpEvaluator.evalRpF(ctx);
 	}
 	
-	public List<Node> visitFilterIS(XPathParser.FilterISContext ctx) { 
+	public List<Node> visitFilterIS(XQueryParser.FilterISContext ctx) { 
 		return xpEvaluator.evalFilterIS(ctx);
 	}
 	
-	public List<Node> visitFilterPara(XPathParser.FilterParaContext ctx) { 
+	public List<Node> visitFilterPara(XQueryParser.FilterParaContext ctx) { 
 		return xpEvaluator.evalFilterPara(ctx);
 	}
 	
-	public List<Node> visitFilterRP(XPathParser.FilterRPContext ctx) { 
+	public List<Node> visitFilterRP(XQueryParser.FilterRPContext ctx) { 
 		return xpEvaluator.evalFilterRP(ctx);
 	}
 	
-	public List<Node> visitFilterNOT(XPathParser.FilterNOTContext ctx) {
+	public List<Node> visitFilterNOT(XQueryParser.FilterNOTContext ctx) {
 		return xpEvaluator.evalFilterNOT(ctx);
 	}
 	
-	public List<Node> visitFilterEQ(XPathParser.FilterEQContext ctx) { 
+	public List<Node> visitFilterEQ(XQueryParser.FilterEQContext ctx) { 
 		return xpEvaluator.evalFilterEQ(ctx);
 	}
 	
-	public List<Node> visitFilterOR(XPathParser.FilterORContext ctx) { 
+	public List<Node> visitFilterOR(XQueryParser.FilterORContext ctx) { 
 		return xpEvaluator.evalFilterOR(ctx);
 	}
 	
-	public List<Node> visitFilterAND(XPathParser.FilterANDContext ctx) { 
+	public List<Node> visitFilterAND(XQueryParser.FilterANDContext ctx) { 
 		return xpEvaluator.evalFilterAND(ctx);
 	}
 }

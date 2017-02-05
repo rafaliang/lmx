@@ -1,8 +1,47 @@
 /**
  * Define a grammar called XPath
  */
-grammar XPath;
+grammar XQuery;
 
+xq:
+Var
+| StringConstant
+| ap
+| '(' xq ')'
+| left=xq ',' right=xq
+| xq '/' rp
+| xq '//' rp
+| '<'leftT=tagName'>' '{'xq'}' '</'rightT=tagName'>'
+| forClause letClause? whereClause? returnClause
+| letClause xq
+;
+
+forClause:
+'for' Var 'in' xq (',' Var 'in' xq)*
+;
+
+letClause:
+'let' Var ':=' xq (',' Var ':=' xq)*
+;
+
+whereClause:
+'where' cond
+;
+
+returnClause:
+'return' xq
+;
+
+cond:
+left=xq EQ right=xq
+| left=xq IS right=xq
+| 'empty(' xq ')'
+| 'some' Var 'in' xq (',' Var 'in' xq)* 'satisfies' cond
+| '(' cond ')'
+| leftCond=cond AND rightCond=cond
+| leftCond=cond OR rightCond=cond
+| NOT cond
+;
 
 ap :
 'doc(\''fileName'\')/'rp    #apSL
@@ -41,6 +80,8 @@ attName : NAME;
 
 fileName : FILENAME;
  
+WS : [ \t\r\n]+ -> skip ;  // skip spaces, tabs, newlines
+ 
 /*
  * OPERATIONS
   */
@@ -52,6 +93,10 @@ NOT : 'not';
 //SSL : '/';
 //DSL : '//';
 
+Var: '$'NAME;
+StringConstant : '\"' (StringCharacter+)? '\"';
+StringCharacter: ~[\"\\@];
+
  /*
   * NAME
   */
@@ -60,4 +105,4 @@ NOT : 'not';
 FILENAME : [a-zA-Z0-9/._]+'.xml';
 NAME : [a-zA-Z_] [a-zA-Z0-9_-]*;
 
-WS : [ \t\r\n]+ -> skip ;  // skip spaces, tabs, newlines
+

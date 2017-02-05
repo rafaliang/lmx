@@ -18,3 +18,5 @@
 /XQueryParser.java
 /XPathBaseVisitor.java
 /XPathVisitor.java
+/XQueryBaseVisitor.java
+/XQueryVisitor.java
