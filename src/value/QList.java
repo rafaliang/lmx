@@ -249,4 +249,10 @@ public class QList implements XQValue, List<Node>{
 		}
 		return res;
 	}
+	
+	public QList copy(){
+		QList res = new QList();
+		res.addAll(lst);
+		return res;
+	}
 }

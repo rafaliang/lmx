@@ -22,6 +22,11 @@ import value.XQValue;
 
 import javax.xml.parsers.DocumentBuilder;   
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -53,8 +58,32 @@ public class xqueryEvaluator{
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document document = builder.newDocument();
 			ele = document.createElement(tagName);
-			for (Node n:lst)
-				ele.appendChild(n);
+			for (Node node:lst){
+				if (node.getNodeType()==2){
+					Node imported = document.importNode(node, true);
+					Element e = document.createElement("Attribute");
+					e.setAttributeNodeNS((Attr)imported);
+					ele.appendChild(e);
+				}
+				// text node
+				else if (node.getNodeType()==3){
+					Node imported = document.importNode(node, true);
+					Element e = document.createElement("TEXT");
+					ele.appendChild(imported);
+					e.appendChild(ele);
+				}
+				// document node
+				else if (node.getNodeType()==9){
+					//System.out.println("doc");
+					System.out.println("document node cannot be created");
+	                return node;
+				}
+				else{
+					Node imported = document.importNode(node, true);
+					ele.appendChild(imported);
+				}
+				//ele.appendChild(node);
+			}
 		}
 		catch(Exception e){System.out.println(e);}
 		return ele;
@@ -116,13 +145,12 @@ public class xqueryEvaluator{
 	}
 	
 	public QList evalXqTAG(XQueryParser.XqTAGContext ctx) {
-		//QList res = new QList();
-		if (ctx.leftT.getText().equals(ctx.rightT.getText())){
+		if (!ctx.leftT.getText().equals(ctx.rightT.getText())){
 			System.out.println("Two tagnames are not the same");
 			return new QList();
 		}
 		//QList xqRes = (QList) visitor.visit(ctx.xq());
-		return new QList(makeElem((QList) visitor.visit(ctx.xq()),ctx.tagName().get(0).getText()));
+		return new QList(makeElem((QList) visitor.visit(ctx.xq()),ctx.leftT.getText()));
 	}
 	
 	public QList evalXqFOR(XQueryParser.XqFORContext ctx) { 
