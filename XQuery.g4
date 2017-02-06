@@ -94,7 +94,7 @@ NOT : 'not';
 //DSL : '//';
 
 Var: '$'NAME;
-StringConstant : '\"' (StringCharacter+)? '\"';
+StringConstant : '\"' (StringCharacter+)? '\"' | '\'' (StringCharacter+)? '\'';
 StringCharacter: ~[\"\\@];
 
  /*

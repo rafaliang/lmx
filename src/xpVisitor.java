@@ -39,6 +39,9 @@ public class xpVisitor extends XQueryBaseVisitor<XQValue>{
 	
 	xpVisitor(){
 		nodelstSt = new Stack<QList>();
+		varSt = new Stack<VarMap>();
+		varSt.push(new VarMap());
+		nodelstSt.push(new QList());
 		xpEvaluator = new xpathEvaluator(this,nodelstSt);
 		xqEvaluator = new xqueryEvaluator(this,nodelstSt,varSt);
 	}

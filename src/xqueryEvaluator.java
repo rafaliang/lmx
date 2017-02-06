@@ -62,6 +62,7 @@ public class xqueryEvaluator{
 	
 	private Node makeText(String text){
 		Text txt=null;
+		text=(String) text.subSequence(1, text.length()-1);
 		try{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();

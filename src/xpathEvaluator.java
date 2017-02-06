@@ -184,7 +184,7 @@ public class xpathEvaluator{
 		QList res = new QList();
 		for (Node node:nodelstSt.peek()){
 			Node n = node.getChildNodes().item(0);
-			if (n.getNodeType()==3)
+			if (n!=null && n.getNodeType()==3)
 				res.add(n);
 		}
 		return res; 

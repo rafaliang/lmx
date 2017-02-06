@@ -74,8 +74,9 @@ import value.QList;
         public static void main( String[] args) throws Exception 
         {
         	
-        	String testcase = "doc(\"./src/a.xml\")//actor[(@id=./../..//singer/@id) or not(@id=./../..//singer/@id)]";
-            //ANTLRInputStream input = new ANTLRInputStream( System.in);
+        	String testcase = "for $x in doc(\"./src/a.xml\")//actor/text() where $x='Michael Caine' return $x/..";
+        	//String testcase = "for $x in doc(\"./src/a.xml\")//actors where $x='hello' return $x";
+        	//ANTLRInputStream input = new ANTLRInputStream( System.in);
         	//String testcase = "for $id in \"ids\" return $id";
         	ANTLRInputStream input = new ANTLRInputStream( testcase);
             XQueryLexer lexer = new XQueryLexer(input);
@@ -84,7 +85,7 @@ import value.QList;
             
             XQueryParser parser = new XQueryParser(tokens);
             //ParseTree tree = parser.ap(); // begin parsing at rule 'ap'
-            ParseTree tree = parser.ap();
+            ParseTree tree = parser.xq();
             
             
             xpVisitor xpVisitor = new xpVisitor();
