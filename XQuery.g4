@@ -36,11 +36,12 @@ cond:
 left=xq EQ right=xq  #condEQ
 | left=xq IS right=xq #condIS
 | 'empty(' xq ')' #condEMPTY
-| 'some' Var 'in' xq (',' Var 'in' xq)* 'satisfies' cond #condSATISFY
+
 | '(' cond ')' #condPARA
 | leftCond=cond AND rightCond=cond #condAND
 | leftCond=cond OR rightCond=cond #condOR
 | NOT cond #condNOT
+| 'some' Var 'in' xq (',' Var 'in' xq)* 'satisfies' cond #condSATISFY
 ;
 
 ap :
@@ -94,8 +95,8 @@ NOT : 'not';
 //DSL : '//';
 
 Var: '$'NAME;
-StringConstant : '\"' (StringCharacter+)? '\"' | '\'' (StringCharacter+)? '\'';
-StringCharacter: ~[\"\\@];
+StringConstant : '"' (StringCharacter+)? '"' | '\'' (StringCharacter+)? '\'';
+StringCharacter: ~[\"\\@\'];
 
  /*
   * NAME

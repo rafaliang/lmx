@@ -74,8 +74,9 @@ import value.QList;
         public static void main( String[] args) throws Exception 
         {
         	
-        	String testcase = "for $x in doc(\"./src/a.xml\")//actor/text() where $x='Michael Caine' return $x/..";
-        	//String testcase = "for $x in doc(\"./src/a.xml\")//actors where $x='hello' return $x";
+        	//String testcase = "for $x in doc(\"./src/a.xml\")//actor let $y:=$x/.., $z:=$y/*/text() where $z='Michael Caine' return $x/..";
+        	String testcase = "for $x in doc(\"./src/a.xml\")//actors where some $y in $x/actor/text(), $z in $y/../age/text() satisfies $y='Michael Caine' and $z='41' return $x";
+        	//String testcase = "for $x in doc(\"./src/a.xml\")//actors let $y:=$x/actor/text(),$z:=$y/../age/text() where $y='Michael Caine' and $z='41' return $x";
         	//ANTLRInputStream input = new ANTLRInputStream( System.in);
         	//String testcase = "for $id in \"ids\" return $id";
         	ANTLRInputStream input = new ANTLRInputStream( testcase);
