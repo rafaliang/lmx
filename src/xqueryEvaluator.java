@@ -16,6 +16,9 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.*;
 
 import value.QList;
+import value.VMList;
+import value.VarMap;
+import value.XQValue;
 
 import javax.xml.parsers.DocumentBuilder;   
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,13 +38,15 @@ import org.w3c.dom.Text;
 public class xqueryEvaluator{
 	protected xpVisitor visitor;
 	protected Stack<QList> nodelstSt;
+	protected Stack<VarMap> varSt;
 	
-	xqueryEvaluator(xpVisitor visitor, Stack<QList> nodelstSt){
+	xqueryEvaluator(xpVisitor visitor, Stack<QList> nodelstSt, Stack<VarMap> varSt){
 		this.visitor = visitor;
 		this.nodelstSt = nodelstSt;
+		this.varSt=varSt;
 	}
 	
-	private Node makeElem(List<Node> lst, String tagName){
+	private Node makeElem(QList lst, String tagName){
 		Element ele=null;
 		try{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -67,4 +72,219 @@ public class xqueryEvaluator{
 		return txt;
 	}
 	
+	public QList evalXqAP(XQueryParser.XqAPContext ctx) { 
+		return (QList) visitor.visit(ctx.ap()); 
+	}
+	
+	public QList evalXqVAR(XQueryParser.XqVARContext ctx) { 
+		VarMap vm = varSt.peek();
+		String var = ctx.Var().getText();
+		if (vm.containsKey(var)) return vm.get(var);
+		else return new QList();
+	}
+	
+	public QList evalXqPARA(XQueryParser.XqPARAContext ctx) { 
+		return (QList) visitor.visit(ctx.xq()); 
+	}
+	
+	public QList evalXqSL(XQueryParser.XqSLContext ctx) { 
+		QList leftRes = (QList) visitor.visit(ctx.xq());
+		nodelstSt.push(leftRes);
+		QList res = (QList) visitor.visit(ctx.rp());
+		nodelstSt.pop();
+		return res;
+	}
+	
+	public QList evalXqDSL(XQueryParser.XqDSLContext ctx) { 
+		QList leftRes = (QList) visitor.visit(ctx.xq());
+		nodelstSt.push(leftRes.getDescedants());
+		QList res = (QList) visitor.visit(ctx.rp());
+		nodelstSt.pop();
+		return res;
+	}
+	
+	public QList evalXqString(XQueryParser.XqStringContext ctx) { 
+		return new QList(makeText(ctx.StringConstant().getText())); 
+	}
+	
+	public QList evalXqLET(XQueryParser.XqLETContext ctx) { 
+		varSt.push((VarMap) visitor.visit(ctx.letClause()));
+		QList res = (QList) visitor.visit(ctx.xq());
+		varSt.pop();
+		return res;
+	}
+	
+	public QList evalXqTAG(XQueryParser.XqTAGContext ctx) {
+		//QList res = new QList();
+		if (ctx.leftT.getText().equals(ctx.rightT.getText())){
+			System.out.println("Two tagnames are not the same");
+			return new QList();
+		}
+		//QList xqRes = (QList) visitor.visit(ctx.xq());
+		return new QList(makeElem((QList) visitor.visit(ctx.xq()),ctx.tagName().get(0).getText()));
+	}
+	
+	public QList evalXqFOR(XQueryParser.XqFORContext ctx) { 
+		VMList vmList = (VMList) visitor.visit(ctx.forClause());
+		QList res = new QList();
+		for (VarMap vm:vmList){
+			varSt.push(vm);
+			if (ctx.letClause()!=null){
+				varSt.push((VarMap) visitor.visit(ctx.letClause()));
+			}
+			if (ctx.whereClause()!=null){
+				if (!((QList) visitor.visit(ctx.whereClause())).isEmpty())
+					res.addAll((QList) visitor.visit(ctx.returnClause()));
+			}
+			else res.addAll((QList) visitor.visit(ctx.returnClause()));
+			if (ctx.letClause()!=null){
+				varSt.pop();
+			}
+			varSt.pop();
+		}
+		return res;
+	}
+	
+	public QList evalXqCOMMA(XQueryParser.XqCOMMAContext ctx) { 
+		QList left = (QList) visitor.visit(ctx.left);
+		QList right = (QList) visitor.visit(ctx.right);
+		left.addAll(right);
+		return left;
+	}
+	
+	private VMList getVMListFor(int idx, XQueryParser.ForClauseContext ctx, VarMap prevVar){
+		VMList res = new VMList();
+		QList lst = (QList) visitor.visit(ctx.xq(idx));
+		if (idx+1==ctx.xq().size()){
+			for (Node node:lst){
+				VarMap curVar = prevVar.copy();
+				curVar.put(ctx.Var(idx).getText(), new QList(node));
+				res.add(curVar);
+			}
+			return res;
+		}
+		for (Node node:lst){
+			nodelstSt.push(new QList(node));
+			VarMap curVar = prevVar.copy();
+			curVar.put(ctx.Var(idx).getText(), new QList(node));
+			varSt.push(curVar);
+			res.addAll(getVMListFor(idx+1,ctx,curVar));
+			varSt.pop();
+			nodelstSt.pop();
+		}
+		return res;
+	}
+	
+	public VMList evalForClause(XQueryParser.ForClauseContext ctx) { 
+		VarMap prevVar = varSt.peek();
+		return getVMListFor(0,ctx,prevVar);
+		
+	}
+	
+	public VarMap evalLetClause(XQueryParser.LetClauseContext ctx) {
+		VarMap curPeek = varSt.peek();
+		VarMap curPeekCopy = varSt.peek().copy();
+		for (int i=0;i<ctx.Var().size();++i){
+			QList lst = (QList) visitor.visit(ctx.xq(i));
+			curPeek.put(ctx.Var(i).getText(), lst);
+		}
+		VarMap res = curPeek.copy();
+		varSt.pop();
+		varSt.push(curPeekCopy);
+		return res;
+	}
+	
+	public QList evalWhereClause(XQueryParser.WhereClauseContext ctx) { 
+		return (QList) visitor.visit(ctx.cond());
+	}
+	
+	public QList evalReturnClause(XQueryParser.ReturnClauseContext ctx) { 
+		return (QList) visitor.visit(ctx.xq());
+	}
+	
+	public QList evalCondEQ(XQueryParser.CondEQContext ctx) { 
+		QList res = new QList();
+		QList left = (QList) visitor.visit(ctx.left);
+		QList right = (QList) visitor.visit(ctx.right);
+		if (left.eq(right)) res.add(null);
+		return res;
+	}
+	
+	public QList evalCondPARA(XQueryParser.CondPARAContext ctx) { 
+		return (QList) visitor.visit(ctx.cond());
+	}
+	
+	public QList evalCondIS(XQueryParser.CondISContext ctx) { 
+		QList res = new QList();
+		QList left = (QList) visitor.visit(ctx.left);
+		QList right = (QList) visitor.visit(ctx.right);
+		if (left.is(right)) res.add(null);
+		return res;
+	}
+	
+	public QList evalCondEMPTY(XQueryParser.CondEMPTYContext ctx) { 
+		return (QList) visitor.visit(ctx.xq());
+	}
+	
+	private VMList getVMListSome(int idx, XQueryParser.CondSATISFYContext ctx, VarMap prevVar){
+		VMList res = new VMList();
+		QList lst = (QList) visitor.visit(ctx.xq(idx));
+		if (idx+1==ctx.xq().size()){
+			for (Node node:lst){
+				VarMap curVar = prevVar.copy();
+				curVar.put(ctx.Var(idx).getText(), new QList(node));
+				res.add(curVar);
+			}
+			return res;
+		}
+		for (Node node:lst){
+			nodelstSt.push(new QList(node));
+			VarMap curVar = prevVar.copy();
+			curVar.put(ctx.Var(idx).getText(), new QList(node));
+			varSt.push(curVar);
+			res.addAll(getVMListSome(idx+1,ctx,curVar));
+			varSt.pop();
+			nodelstSt.pop();
+		}
+		return res;
+	}
+	
+	public QList evalCondSATISFY(XQueryParser.CondSATISFYContext ctx) {
+		QList res = new QList();
+		VarMap curVarCopy = varSt.peek().copy();
+		VMList vmList = getVMListSome(0,ctx,curVarCopy);
+		for (VarMap vm:vmList){
+			varSt.push(vm);
+			if (!((QList) visitor.visit(ctx.cond())).isEmpty()){
+				res.add(null);
+				varSt.pop();
+				return res;
+			}
+			varSt.pop();
+		}
+		return res;
+	}
+	
+	public QList evalCondAND(XQueryParser.CondANDContext ctx) {
+		QList res = new QList();
+		QList left = (QList) visitor.visit(ctx.leftCond);
+		QList right = (QList) visitor.visit(ctx.rightCond);
+		if (left.and(right)) res.add(null);
+		return res;
+	}
+	
+	public QList evalCondOR(XQueryParser.CondORContext ctx) {
+		QList res = new QList();
+		QList left = (QList) visitor.visit(ctx.leftCond);
+		QList right = (QList) visitor.visit(ctx.rightCond);
+		if (left.or(right)) res.add(null);
+		return res;
+	}
+	
+	public QList evalCondNOT(XQueryParser.CondNOTContext ctx) {
+		QList res = new QList();
+		QList lst = (QList) visitor.visit(ctx.cond());
+		if (lst.isEmpty()) res.add(null);
+		return res;
+	}
 }

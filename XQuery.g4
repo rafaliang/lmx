@@ -8,7 +8,7 @@ Var #xqVAR
 | StringConstant #xqString
 | ap #xqAP
 | '(' xq ')' #xqPARA
-| left=xq ',' right=xq #xqComma
+| left=xq ',' right=xq #xqCOMMA
 | xq '/' rp #xqSL
 | xq '//' rp #xqDSL
 | '<'leftT=tagName'>' '{'xq'}' '</'rightT=tagName'>' #xqTAG
