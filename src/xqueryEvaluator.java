@@ -251,8 +251,10 @@ public class xqueryEvaluator{
 		return res;
 	}
 	
-	public QList evalCondEMPTY(XQueryParser.CondEMPTYContext ctx) { 
-		return (QList) visitor.visit(ctx.xq());
+	public QList evalCondEMPTY(XQueryParser.CondEMPTYContext ctx) {
+		QList res = new QList();
+		if (((QList) visitor.visit(ctx.xq())).isEmpty()) res.add(null);
+		return res;
 	}
 	
 	private VMList getVMListSome(int idx, XQueryParser.CondSATISFYContext ctx, VarMap prevVar){

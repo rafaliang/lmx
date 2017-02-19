@@ -1,17 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<root xmlns:bar="http://www.bar.org" xmlns:foo="http://www.foo.org/">
-	<actors>
-		<actor id="1">Christian Bale<age>51</age>
-</actor>
-		<actor id="2">Liam Neeson<age>41</age>
-</actor>			
-		<actor id="3">Michael Caine<age>31</age>
-</actor>
-			
-	</actors>
-	<singers>
-		<singer id="1">Tom Waits</singer>
-		<singer id="5">B.B. King</singer>
-		<singer id="2">Ray Charles</singer>
-	</singers>
-</root>
+<?xml version="1.0" encoding="UTF-8"?><result>
+<acts>
+<act>ACT IV</act>
+<act>ACT V</act>
+</acts>
+</result>
