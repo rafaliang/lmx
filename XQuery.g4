@@ -45,10 +45,8 @@ left=xq EQ right=xq  #condEQ
 ;
 
 ap :
-'doc(\''fileName'\')/'rp    #apSL
-|'doc("'fileName'")/'rp    #apSL
-|'doc(\''fileName'\')//'rp   #apDSL
-| 'doc("'fileName'")//'rp   #apDSL
+'doc('fileName')/'rp    #apSL
+| 'doc('fileName')//'rp   #apDSL
 ;
 
 rp : 
@@ -79,7 +77,7 @@ tagName : NAME;
 
 attName : NAME;
 
-fileName : FILENAME;
+fileName : StringConstant;
  
 WS : [ \t\r\n]+ -> skip ;  // skip spaces, tabs, newlines
  
@@ -95,15 +93,18 @@ NOT : 'not';
 //DSL : '//';
 
 Var: '$'NAME;
-StringConstant : '"' (StringCharacter+)? '"' | '\'' (StringCharacter+)? '\'';
-StringCharacter: ~[\"\\@\'];
+StringConstant : '\"' (Strings)? '\"' | '\'' (Strings)? '\'';
+fragment Strings : StringCharacter+;
+fragment StringCharacter: ~[\"\\@\'];
 
  /*
   * NAME
   */
 //LETTER : [a-zA-Z_];
 //LETTERANDDIGIT : [a-zA-Z0-9_-];
-FILENAME : [a-zA-Z0-9/._]+'.xml';
+//FILENAME : [a-zA-Z0-9/._]+'.xml';
 NAME : [a-zA-Z_] [a-zA-Z0-9_-]*;
 
+fragment LETTER : [a-zA-Z_];
+fragment LETTER_DIGIT : [a-zA-Z0-9_-];
 

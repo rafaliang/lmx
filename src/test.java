@@ -79,11 +79,11 @@ import value.QList;
         	//String testcase = "for $x in doc(\"./src/a.xml\")//actors let $y:=$x/actor/text(),$z:=$y/../age/text() where $y=\"Michael Caine\" and $z='41' return $x";
         	
         	// test cases for xquery (4 in total)
-        	String testcase = "<acts> {	for $a in doc(\"./src/j_caesar.xml\")//ACT where empty( for $sp in $a/SCENE/SPEECH/SPEAKER where $sp/text() = 'CASCA' return <speaker> {$sp/text()}</speaker> )return <act>{$a/TITLE/text()}</act>}</acts>";
+        	//String testcase = "<acts> {	for $a in doc(\"./src/j_caesar.xml\")//ACT where empty( for $sp in $a/SCENE/SPEECH/SPEAKER where $sp/text() = \"CASCA\" return <speaker> {$sp/text()}</speaker> )return <act>{$a/TITLE/text()}</act>}</acts>";
         	
         	//String testcase="<result>{  for $a in (for $s in doc(\"./src/j_caesar.xml\")//ACT return $s), $sc in (for $t in $a/SCENE return $t), $sp in (for $d in $sc/SPEECH return $d) where $sp/LINE/text() = 'Et tu, Brute! Then fall, Caesar.' return <who>{$sp/SPEAKER/text()}</who>, <when>{ <act>{$a/TITLE/text()}</act>, <scene>{$sc/TITLE/text()}</scene> }</when>}</result>" ;
         	//String testcase = "<result>{ for $a in doc(\"./src/j_caesar.xml\")//PERSONAE, $b in $a/PERSONA where ($b/text() = \'JULIUS CAESAR\') or ($b/text() = 'Another Poet') return $b}</result>" ;
-        	//String testcase = "<result>{ for $a in doc(\"./src/j_caesar.xml\")//PERSONAE, $b in $a/PERSONA where not (($b/text() = 'JULIUS CAESAR') or ($b/text() = 'Another Poet') ) return $b}</result>" ;
+        	String testcase = "<result>{ for $a in doc(\"./src/j_caesar.xml\")//PERSONAE, $b in $a/PERSONA where not (($b/text() = 'JULIUS CAESAR') or ($b/text() = 'Another Poet') ) return $b}</result>" ;
         	
         	//ANTLRInputStream input = new ANTLRInputStream( System.in);
         	//String testcase = "for $id in \"ids\" return $id";
@@ -95,14 +95,14 @@ import value.QList;
             XQueryParser parser = new XQueryParser(tokens);
             //ParseTree tree = parser.ap(); // begin parsing at rule 'ap'
             ParseTree tree = parser.xq();
-            
+            System.out.println(tree.toStringTree(parser)); // print LISP-style tree
             
             xpVisitor xpVisitor = new xpVisitor();
             QList res = (QList) xpVisitor.visit(tree);
             write2xml(res);
             
             
-            System.out.println(tree.toStringTree(parser)); // print LISP-style tree
+            
             
             
             

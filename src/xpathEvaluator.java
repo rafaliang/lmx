@@ -101,6 +101,7 @@ public class xpathEvaluator{
 	private Node readXML(String fileName){
 		Document doc = null;
 		try{
+			//System.out.println(fileName);
 			File file = new File(fileName);
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
@@ -113,6 +114,7 @@ public class xpathEvaluator{
 	public QList evalApSL(XQueryParser.ApSLContext ctx){
 		QList lst = new QList();
 		String xmlFile = ctx.fileName().getText();
+		xmlFile = xmlFile.substring(1,xmlFile.length()-1);
 		lst.add(this.readXML(xmlFile));
 		nodelstSt.push(lst);
 		lst = (QList) visitor.visit(ctx.rp());
@@ -123,6 +125,7 @@ public class xpathEvaluator{
 	public QList evalApDSL(XQueryParser.ApDSLContext ctx){
 		QList lst = new QList();
 		String xmlFile = ctx.fileName().getText();
+		xmlFile = xmlFile.substring(1,xmlFile.length()-1);
 		lst.add(this.readXML(xmlFile));
 		lst = lst.getDescedants();
 		nodelstSt.push(lst);
