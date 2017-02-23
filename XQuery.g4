@@ -46,7 +46,9 @@ left=xq EQ right=xq  #condEQ
 
 ap :
 'doc('fileName')/'rp    #apSL
+|'document('fileName')/'rp    #apSL
 | 'doc('fileName')//'rp   #apDSL
+| 'document('fileName')//'rp   #apDSL
 ;
 
 rp : 

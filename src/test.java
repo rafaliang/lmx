@@ -76,14 +76,18 @@ import value.QList;
         	//String testcase = "<hello>{\"hello\"}</hello>";
         	//String testcase = "for $x in doc(\"./src/a.xml\")//actor let $y:=$x/.., $z:=$y/*/text() where $z=\'Michael Caine\' return $x/..";
         	//String testcase = "for $x in doc(\"./src/a.xml\")//actors where some $y in $x/actor/text(), $z in $y/../age/text() satisfies $y='Michael Caine' and $z='41' return $x";
-        	//String testcase = "for $x in doc(\"./src/a.xml\")//actors let $y:=$x/actor/text(),$z:=$y/../age/text() where $y=\"Michael Caine\" and $z='41' return $x";
+        	//String testcase = "for $x in doc(\"./src/a.xml\")//actors let $y:=$x/actor,$z:=$y/age/text() where $y/text()=\"Michael Caine\" and $z='41' return $x";
+        	//String testcase = "for $x in doc(\"./src/a.xml\")//actors where some  $y in $x/actor,$z in $y/age/text() satisfies $y/text()=\"Michael Caine\" and $z='41' return $x";
         	
         	// test cases for xquery (4 in total)
         	//String testcase = "<acts> {	for $a in doc(\"./src/j_caesar.xml\")//ACT where empty( for $sp in $a/SCENE/SPEECH/SPEAKER where $sp/text() = \"CASCA\" return <speaker> {$sp/text()}</speaker> )return <act>{$a/TITLE/text()}</act>}</acts>";
         	
         	//String testcase="<result>{  for $a in (for $s in doc(\"./src/j_caesar.xml\")//ACT return $s), $sc in (for $t in $a/SCENE return $t), $sp in (for $d in $sc/SPEECH return $d) where $sp/LINE/text() = 'Et tu, Brute! Then fall, Caesar.' return <who>{$sp/SPEAKER/text()}</who>, <when>{ <act>{$a/TITLE/text()}</act>, <scene>{$sc/TITLE/text()}</scene> }</when>}</result>" ;
         	//String testcase = "<result>{ for $a in doc(\"./src/j_caesar.xml\")//PERSONAE, $b in $a/PERSONA where ($b/text() = \'JULIUS CAESAR\') or ($b/text() = 'Another Poet') return $b}</result>" ;
-        	String testcase = "<result>{ for $a in doc(\"./src/j_caesar.xml\")//PERSONAE, $b in $a/PERSONA where not (($b/text() = 'JULIUS CAESAR') or ($b/text() = 'Another Poet') ) return $b}</result>" ;
+        	//String testcase = "<result>{ for $a in doc(\"./src/j_caesar.xml\")//PERSONAE, $b in $a/PERSONA where not (($b/text() = 'JULIUS CAESAR') or ($b/text() = 'Another Poet') ) return $b}</result>" ;
+        	
+        	//String testcase = "<result>{ for $a in document(\"./src/j_caesar.xml\")//ACT, $sc in $a//SCENE,$sp in $sc/SPEECH where $sp/LINE/text() = \"Et tu, Brute! Then fall, Caesar.\" return <who>{$sp/SPEAKER/text()}</who>, <when>{<act>{$a/TITLE/text()}</act>,<scene>{$sc/TITLE/text()}</scene>}</when>}</result>";
+        	String testcase = "for $s in document(\"./src/j_caesar.xml\")//SPEAKER return <speaks>{<who>{$s/text()}</who>, for $a in document(\"./src/j_caesar.xml\")//ACT where some $s1 in $a//SPEAKER satisfies $s1 eq $s return <when>{$a/TITLE/text()}</when>} </speaks>";
         	
         	//ANTLRInputStream input = new ANTLRInputStream( System.in);
         	//String testcase = "for $id in \"ids\" return $id";
