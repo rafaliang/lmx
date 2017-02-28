@@ -1,7 +1,10 @@
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -30,7 +33,7 @@ import value.QList;
     		try {
     			builder = factory.newDocumentBuilder();
     			Document document = builder.newDocument();
-    			Element tmp = document.createElement("result");
+    			Element tmp = document.createElement("myResult");
     			for (Node node:lst){
     				if (node==null) continue;
     				// attribute node
@@ -71,23 +74,58 @@ import value.QList;
     	        
     	}
     	
-        public static void main( String[] args) throws Exception 
+        private static String readQuery(){
+        	String path = "./src/query.txt";
+        	String res="";
+        	try{
+        		File file=new File(path);
+        		if(file.isFile() && file.exists()){ 
+                    InputStreamReader read = new InputStreamReader(
+                    		new FileInputStream(file));
+                    BufferedReader bufferedReader = new BufferedReader(read);
+                    String lineTxt = null;
+                    while((lineTxt = bufferedReader.readLine()) != null){
+                        res+=(lineTxt+" ");
+                    }
+                    read.close();
+        		}
+        	}
+    		catch (Exception e) {
+                System.out.println(e);
+                e.printStackTrace();
+            }
+        	
+        	
+        	return res;
+        }
+    	
+    	public static void main( String[] args) throws Exception 
         {
+        	//String testcase = "doc(\"./src/a.xml\")//age/text()/../.. [text()]";
         	//String testcase = "<hello>{\"hello\"}</hello>";
-        	//String testcase = "for $x in doc(\"./src/a.xml\")//actor let $y:=$x/.., $z:=$y/*/text() where $z=\'Michael Caine\' return $x/..";
+        	//String testcase = "for $x in doc(\"./src/a.xml\")//actor let $y:=$x/.., $z:=$y/*/text() where $z=\'Michael Caine\' return $z";
         	//String testcase = "for $x in doc(\"./src/a.xml\")//actors where some $y in $x/actor/text(), $z in $y/../age/text() satisfies $y='Michael Caine' and $z='41' return $x";
         	//String testcase = "for $x in doc(\"./src/a.xml\")//actors let $y:=$x/actor,$z:=$y/age/text() where $y/text()=\"Michael Caine\" and $z='41' return $x";
         	//String testcase = "for $x in doc(\"./src/a.xml\")//actors where some  $y in $x/actor,$z in $y/age/text() satisfies $y/text()=\"Michael Caine\" and $z='41' return $x";
         	
         	// test cases for xquery (4 in total)
-        	//String testcase = "<acts> {	for $a in doc(\"./src/j_caesar.xml\")//ACT where empty( for $sp in $a/SCENE/SPEECH/SPEAKER where $sp/text() = \"CASCA\" return <speaker> {$sp/text()}</speaker> )return <act>{$a/TITLE/text()}</act>}</acts>";
+        	//String testcase = "<acts> {	for $a in doc(\"./src/j_caesar.xml\")//ACT where not empty( for $sp in $a/SCENE/SPEECH/SPEAKER where $sp/text() = \"CASCA\" return <speaker> {$sp/text()}</speaker> )return <act>{$a/TITLE/text()}</act>}</acts>";
         	
         	//String testcase="<result>{  for $a in (for $s in doc(\"./src/j_caesar.xml\")//ACT return $s), $sc in (for $t in $a/SCENE return $t), $sp in (for $d in $sc/SPEECH return $d) where $sp/LINE/text() = 'Et tu, Brute! Then fall, Caesar.' return <who>{$sp/SPEAKER/text()}</who>, <when>{ <act>{$a/TITLE/text()}</act>, <scene>{$sc/TITLE/text()}</scene> }</when>}</result>" ;
         	//String testcase = "<result>{ for $a in doc(\"./src/j_caesar.xml\")//PERSONAE, $b in $a/PERSONA where ($b/text() = \'JULIUS CAESAR\') or ($b/text() = 'Another Poet') return $b}</result>" ;
         	//String testcase = "<result>{ for $a in doc(\"./src/j_caesar.xml\")//PERSONAE, $b in $a/PERSONA where not (($b/text() = 'JULIUS CAESAR') or ($b/text() = 'Another Poet') ) return $b}</result>" ;
         	
-        	//String testcase = "<result>{ for $a in document(\"./src/j_caesar.xml\")//ACT, $sc in $a//SCENE,$sp in $sc/SPEECH where $sp/LINE/text() = \"Et tu, Brute! Then fall, Caesar.\" return <who>{$sp/SPEAKER/text()}</who>, <when>{<act>{$a/TITLE/text()}</act>,<scene>{$sc/TITLE/text()}</scene>}</when>}</result>";
-        	String testcase = "for $s in document(\"./src/j_caesar.xml\")//SPEAKER return <speaks>{<who>{$s/text()}</who>, for $a in document(\"./src/j_caesar.xml\")//ACT where some $s1 in $a//SPEAKER satisfies $s1 eq $s return <when>{$a/TITLE/text()}</when>} </speaks>";
+        	//String testcase = "<result>{ for $a in document(\"./src/j_caesar.xml\")//ACT, $sc in $a//SCENE,$sp in $sc/SPEECH where $sp/LINE/text() eq \"Et tu, Brute! Then fall, Caesar.\" return <who>{$sp/SPEAKER/text()}</who>, <when>{<act>{$a/TITLE/text()}</act>,<scene>{$sc/TITLE/text()}</scene>}</when>}</result>";
+        	//String testcase = "for $s in document(\"./src/j_caesar.xml\")//SPEAKER return <speaks>{<who>{$s/text()}</who>, for $a in document(\"./src/j_caesar.xml\")//ACT where some $s1 in $a//SPEAKER satisfies $s1 eq $s return <when>{$a/TITLE/text()}</when>} </speaks>";
+        	String testcase=readQuery();
+        	
+        	         	
+        	
+        	// DEMOOOOOOOOOOOOOOOOOOOO
+        	
+        	
+        	
+        	
         	
         	//ANTLRInputStream input = new ANTLRInputStream( System.in);
         	//String testcase = "for $id in \"ids\" return $id";

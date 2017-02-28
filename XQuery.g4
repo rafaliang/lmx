@@ -35,7 +35,7 @@ returnClause:
 cond:
 left=xq EQ right=xq  #condEQ
 | left=xq IS right=xq #condIS
-| 'empty(' xq ')' #condEMPTY
+| 'empty'+'(' xq ')' #condEMPTY
 
 | '(' cond ')' #condPARA
 | leftCond=cond AND rightCond=cond #condAND

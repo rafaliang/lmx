@@ -146,6 +146,8 @@ public class xqueryEvaluator{
 	
 	public QList evalXqTAG(XQueryParser.XqTAGContext ctx) {
 		if (!ctx.leftT.getText().equals(ctx.rightT.getText())){
+			System.out.println(ctx.leftT.getText());
+			System.out.println(ctx.rightT.getText());
 			System.out.println("Two tagnames are not the same");
 			return new QList();
 		}
