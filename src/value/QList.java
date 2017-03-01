@@ -24,6 +24,12 @@ public class QList implements XQValue, List<Node>{
 		lst = new ArrayList<Node>();
 		lst.add(node);
 	}
+	
+	public QList(NodeList nodeLst){
+		lst = new ArrayList<Node>();
+		for (int i=0;i<nodeLst.getLength();++i)
+			lst.add(nodeLst.item(i));
+	}
 
 	@Override
 	public int size() {

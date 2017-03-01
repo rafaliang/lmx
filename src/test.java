@@ -36,6 +36,7 @@ import value.QList;
     			Element tmp = document.createElement("myResult");
     			for (Node node:lst){
     				if (node==null) continue;
+    				//System.out.println(node.getTextContent());
     				// attribute node
     				if (node.getNodeType()==2){
     					Node imported = document.importNode(node, true);
@@ -139,9 +140,14 @@ import value.QList;
             ParseTree tree = parser.xq();
             System.out.println(tree.toStringTree(parser)); // print LISP-style tree
             
-            xpVisitor xpVisitor = new xpVisitor();
-            QList res = (QList) xpVisitor.visit(tree);
-            write2xml(res);
+            
+            queryRewriter2 qw= new queryRewriter2();
+            qw.visit(tree);
+            
+            //xpVisitor xpVisitor = new xpVisitor();
+            //QList res = (QList) xpVisitor.visit(tree);
+            
+            //write2xml(res);
             
             
             

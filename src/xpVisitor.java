@@ -213,4 +213,12 @@ public class xpVisitor extends XQueryBaseVisitor<XQValue>{
 	public XQValue visitCondNOT(XQueryParser.CondNOTContext ctx) { 
 		return xqEvaluator.evalCondNOT(ctx); 
 	}
+	
+	public XQValue visitXqJoin(XQueryParser.XqJoinContext ctx) { 
+		return xqEvaluator.evalXqJoin(ctx); 
+	}
+	
+	public XQValue visitJoinClause(XQueryParser.JoinClauseContext ctx) { 
+		return xqEvaluator.evalJoinClause(ctx); 
+	}
 }

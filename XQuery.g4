@@ -14,6 +14,7 @@ Var #xqVAR
 | '<'leftT=tagName'>' '{'xq'}' '</'rightT=tagName'>' #xqTAG
 | forClause letClause? whereClause? returnClause #xqFOR
 | letClause xq #xqLET
+| joinClause #xqJoin
 ;
 
 forClause:
@@ -31,6 +32,13 @@ whereClause:
 returnClause:
 'return' xq
 ;
+
+joinClause:
+'join' '(' xq1=xq ',' xq2=xq ',' varList1 = VarList ',' varList2 = VarList ')'
+;
+
+VarList: '[' NAME (','NAME)*']';
+
 
 cond:
 left=xq EQ right=xq  #condEQ
@@ -96,6 +104,7 @@ NOT : 'not';
 
 Var: '$'NAME;
 StringConstant : '\"' (Strings)? '\"' | '\'' (Strings)? '\'';
+
 fragment Strings : StringCharacter+;
 fragment StringCharacter: ~[\"\\@\'];
 

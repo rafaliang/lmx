@@ -320,4 +320,65 @@ public class xqueryEvaluator{
 		if (lst.isEmpty()) res.add(null);
 		return res;
 	}
+	
+	public QList evalXqJoin(XQueryParser.XqJoinContext ctx) { 
+		return (QList) visitor.visit(ctx.joinClause());
+	}
+	
+	public QList evalJoinClause(XQueryParser.JoinClauseContext ctx) { 
+		QList res = new QList();
+		QList ql1 = (QList) visitor.visit(ctx.xq1);
+		QList ql2 = (QList) visitor.visit(ctx.xq2);
+		String var1 = ctx.varList1.getText();
+		String var2 = ctx.varList2.getText();
+		String[] varList1= var1.substring(1,var1.length()-1).split(",");
+		String[] varList2= var2.substring(1,var2.length()-1).split(",");
+		//System.out.println(ql1.toString());
+		for (Node node1:ql1){
+			for (Node node2:ql2){
+				Boolean equal = true;
+				for (int i=0;i<varList1.length;++i){
+					String tag1 = varList1[i];
+					String tag2 = varList2[i];
+					//System.out.println(tag1);
+					NodeList node1Child = node1.getChildNodes();
+					NodeList node2Child = node2.getChildNodes();
+					Node node1Tag = null;
+					Node node2Tag = null;
+					for (int j=0;j<node1Child.getLength();++j){
+						if (node1Child.item(j).getNodeName().equals(tag1)){
+							node1Tag=node1Child.item(j);
+							break;
+						}
+					}
+					for (int j=0;j<node2Child.getLength();++j){
+						if (node2Child.item(j).getNodeName().equals(tag2)){
+							node2Tag=node2Child.item(j);
+							break;
+						}
+					}
+					QList node1TagChild = new QList(node1Tag).getChildren();
+					QList node2TagChild = new QList(node2Tag).getChildren();
+					
+					if (!node1TagChild.eq(node2TagChild)){
+						equal = false;
+						break;
+					}
+				}
+				if (!equal) continue;
+				QList tmp = new QList();
+				tmp.addAll(new QList(node1).getChildren());
+				tmp.addAll(new QList(node2).getChildren());
+				//for (int i=0;i<tmp.size();++i)
+					//System.out.println(tmp.get(i).getTextContent());
+				Node tuple = makeElem(tmp,"tuple");
+				//System.out.println(tuple.getChildNodes().getLength());
+				//System.out.println(tuple.getTextContent());
+				res.add(tuple);
+			}
+		}
+		
+		
+		return res;
+	}
 }
