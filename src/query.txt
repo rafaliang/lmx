@@ -1,11 +1,14 @@
-for $b in doc("input")/book,
-$a in doc("input")/entry,
-$tb in $b/title,
-$ta in $a/title
-where $tb eq $ta
+for $tuple in join(
+	for $a in doc("./src/a.xml")//actor,
+		$aa in $a/age
+		return <tuple>{<a>{$a}</a>,<aa>{$aa}</aa>}</tuple>,
+	for $s in doc("./src/a.xml")//singer,
+		$sa in $s/age
+		return <tuple>{<s>{$s}</s>,<sa>{$sa}</sa>}</tuple>,
+	[aa],[sa])
 return
-<book-with-prices>
-{ $tb,
-<price-review>{ $a/price }</price-review>,
-<price>{ $b/price }</price> }
-</book-with-prices>
+<people-with-ages>{
+	$tuple/aa/*,
+	<actor>{$tuple/a/*}</actor>,
+	<singer>{$tuple/s/*}</singer>}
+</people-with-ages>

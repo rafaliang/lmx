@@ -333,7 +333,7 @@ public class xqueryEvaluator{
 		String var2 = ctx.varList2.getText();
 		String[] varList1= var1.substring(1,var1.length()-1).split(",");
 		String[] varList2= var2.substring(1,var2.length()-1).split(",");
-		//System.out.println(ql1.toString());
+		Map<QList,Node> nodeMap = new HashMap<QList,Node>();
 		for (Node node1:ql1){
 			for (Node node2:ql2){
 				Boolean equal = true;
@@ -359,7 +359,9 @@ public class xqueryEvaluator{
 					}
 					QList node1TagChild = new QList(node1Tag).getChildren();
 					QList node2TagChild = new QList(node2Tag).getChildren();
-					
+					System.out.println("test");
+					System.out.println(node1TagChild.get(0));
+					System.out.println(node2TagChild.get(0).toString().hashCode());
 					if (!node1TagChild.eq(node2TagChild)){
 						equal = false;
 						break;

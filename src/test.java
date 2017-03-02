@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -141,13 +142,15 @@ import value.QList;
             System.out.println(tree.toStringTree(parser)); // print LISP-style tree
             
             
-            queryRewriter2 qw= new queryRewriter2();
-            qw.visit(tree);
+            //queryRewriter2 qw= new queryRewriter2();
+            //qw.visit(tree);
             
-            //xpVisitor xpVisitor = new xpVisitor();
-            //QList res = (QList) xpVisitor.visit(tree);
             
-            //write2xml(res);
+            
+            xpVisitor xpVisitor = new xpVisitor();
+            QList res = (QList) xpVisitor.visit(tree);
+            
+            write2xml(res);
             
             
             
