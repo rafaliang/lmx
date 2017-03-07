@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,6 +41,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text; 
 
+
 public class xqueryEvaluator{
 	protected xpVisitor visitor;
 	protected Stack<QList> nodelstSt;
@@ -49,6 +51,18 @@ public class xqueryEvaluator{
 		this.visitor = visitor;
 		this.nodelstSt = nodelstSt;
 		this.varSt=varSt;
+	}
+	
+	private String getString(Node node){
+		String res = "";
+		StringWriter writer = new StringWriter();
+		try{
+			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			transformer.transform(new DOMSource(node), new StreamResult(writer));
+			res = writer.toString();
+		}
+		catch (Exception e){};
+		return res;
 	}
 	
 	private Node makeElem(QList lst, String tagName){
@@ -333,7 +347,58 @@ public class xqueryEvaluator{
 		String var2 = ctx.varList2.getText();
 		String[] varList1= var1.substring(1,var1.length()-1).split(",");
 		String[] varList2= var2.substring(1,var2.length()-1).split(",");
-		Map<QList,Node> nodeMap = new HashMap<QList,Node>();
+		Map<String,QList> nodeMap = new HashMap<String,QList>();
+		
+		// if compare list is not equal size or is empty return empty list
+		if (varList1.length==0 || varList1.length!=varList2.length) return res;
+		
+		for (Node node2:ql2){
+			String tag2 = varList2[0];
+			Node nodeByTag = new QList(node2).getChildByTag(tag2).getFirstChild();
+			String node2Str = this.getString(nodeByTag);
+			//System.out.println(node2Str);
+			if (nodeMap.containsKey(node2Str)){
+				QList lst = nodeMap.get(node2Str);
+				lst.add(node2);
+				nodeMap.put(node2Str, lst);
+			}
+			else nodeMap.put(node2Str, new QList(node2));
+		}
+		
+		for (Node node1:ql1){
+			String tag = varList1[0];
+			Node nodeByTag = new QList(node1).getChildByTag(tag).getFirstChild();
+			String nodeStr = this.getString(nodeByTag);
+			if (!nodeMap.containsKey(nodeStr)) continue;
+			QList lst = nodeMap.get(nodeStr);
+			for (Node node2:lst){
+				Boolean equal = true;
+				for (int i=1;i<varList1.length;++i){
+					String tag1 = varList1[i];
+					String tag2 = varList2[i];
+					//System.out.println(tag1);
+					Node node1ByTag = new QList(node1).getChildByTag(tag1).getFirstChild();
+					Node node2ByTag = new QList(node2).getChildByTag(tag2).getFirstChild();
+					
+					if (!node1ByTag.isEqualNode(node2ByTag)){
+						equal = false;
+						break;
+					}
+				}
+				if (!equal) continue;
+				QList tmp = new QList();
+				tmp.addAll(new QList(node1).getChildren());
+				tmp.addAll(new QList(node2).getChildren());
+				//for (int i=0;i<tmp.size();++i)
+					//System.out.println(tmp.get(i).getTextContent());
+				Node tuple = makeElem(tmp,"tuple");
+				//System.out.println(tuple.getChildNodes().getLength());
+				//System.out.println(tuple.getTextContent());
+				res.add(tuple);
+			}
+		}
+		
+		/*
 		for (Node node1:ql1){
 			for (Node node2:ql2){
 				Boolean equal = true;
@@ -360,8 +425,11 @@ public class xqueryEvaluator{
 					QList node1TagChild = new QList(node1Tag).getChildren();
 					QList node2TagChild = new QList(node2Tag).getChildren();
 					System.out.println("test");
-					System.out.println(node1TagChild.get(0));
-					System.out.println(node2TagChild.get(0).toString().hashCode());
+					
+					String xml = "";
+					
+					System.out.println(xml);
+					System.out.println(node2TagChild.get(0).hashCode());
 					if (!node1TagChild.eq(node2TagChild)){
 						equal = false;
 						break;
@@ -378,7 +446,7 @@ public class xqueryEvaluator{
 				//System.out.println(tuple.getTextContent());
 				res.add(tuple);
 			}
-		}
+		}*/
 		
 		
 		return res;

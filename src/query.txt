@@ -1,14 +1,16 @@
 for $tuple in join(
 	for $a in doc("./src/a.xml")//actor,
-		$aa in $a/age
-		return <tuple>{<a>{$a}</a>,<aa>{$aa}</aa>}</tuple>,
+		$aa in $a/age,
+		$an in $a/name
+		return <tuple>{<a>{$a}</a>,<aa>{$aa}</aa>,<an>{$an}</an>}</tuple>,
 	for $s in doc("./src/a.xml")//singer,
-		$sa in $s/age
-		return <tuple>{<s>{$s}</s>,<sa>{$sa}</sa>}</tuple>,
-	[aa],[sa])
+		$sa in $s/age,
+		$sn in $s/name
+		return <tuple>{<s>{$s}</s>,<sa>{$sa}</sa>,<sn>{$sn}</sn>}</tuple>,
+	[an,aa],[sn,sa])
 return
 <people-with-ages>{
 	$tuple/aa/*,
-	<actor>{$tuple/a/*}</actor>,
-	<singer>{$tuple/s/*}</singer>}
+	<actor>{$tuple/a/*/name}</actor>,
+	<singer>{$tuple/s/*/name}</singer>}
 </people-with-ages>

@@ -1,13 +1,63 @@
 <root xmlns:foo="http://www.foo.org/" xmlns:bar="http://www.bar.org">
 	<actors>
-		<actor id="1">Christian Bale<age>51</age></actor>
-		<actor id="2">Liam Neeson<age>41</age></actor>			
-		<actor id="3">Michael Caine<age>31</age></actor>
+		<actor id="1">
+			<age>51</age>
+			<name>
+				<first_name>Christian</first_name>
+				<last_name>Bale</last_name>
+			</name>
+		</actor>
+		
+		<actor id="2">
+			<name>
+				<first_name>Liam</first_name>
+				<last_name>Neeson</last_name>
+			</name>
+			<age>41</age>
+		</actor>
+				
+		<actor id="3">
+			<name>
+				<first_name>Michael</first_name>
+				<last_name>Caine</last_name>
+			</name>
+			<age>31</age>
+		</actor>
 			
 	</actors>
+	
 	<singers>
-		<singer id="4">Tom Waits<age>51</age></singer>
-		<singer id="5">B.B. King<age>41</age></singer>
-		<singer id="6">Ray Charles<age>31</age></singer>
+		<singer id="4">
+			<name>
+				<first_name>Tom</first_name>
+				<last_name>Waits</last_name>
+			</name>
+			<age>51</age>
+		</singer>
+		
+		<singer id="5">
+			<name>
+				<first_name>B.B.</first_name>
+				<last_name>King</last_name>
+			</name>
+			<age>41</age>
+		</singer>
+		
+		<singer id="6">
+			<name>
+				<first_name>Ray</first_name>
+				<last_name>Charles</last_name>
+			</name>
+			<age>31</age>
+		</singer>
+		
+		<singer id="7">
+			<name>
+				<first_name>Michael</first_name>
+				<last_name>Caine</last_name>
+			</name>
+			<age>31</age>
+		</singer>
+		
 	</singers>
 </root>

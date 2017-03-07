@@ -1,35 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?><myResult>
 <people-with-ages>
-<age>51</age>
-<actor>
-<actor id="1">Christian Bale<age>51</age>
-</actor>
-</actor>
-<singer>
-<singer id="4">Tom Waits<age>51</age>
-</singer>
-</singer>
-</people-with-ages>
-<people-with-ages>
-<age>41</age>
-<actor>
-<actor id="2">Liam Neeson<age>41</age>
-</actor>
-</actor>
-<singer>
-<singer id="5">B.B. King<age>41</age>
-</singer>
-</singer>
-</people-with-ages>
-<people-with-ages>
 <age>31</age>
 <actor>
-<actor id="3">Michael Caine<age>31</age>
-</actor>
+<name>
+				<first_name>Michael</first_name>
+				<last_name>Caine</last_name>
+			</name>
 </actor>
 <singer>
-<singer id="6">Ray Charles<age>31</age>
-</singer>
+<name>
+				<first_name>Michael</first_name>
+				<last_name>Caine</last_name>
+			</name>
 </singer>
 </people-with-ages>
 </myResult>

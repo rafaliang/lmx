@@ -261,4 +261,15 @@ public class QList implements XQValue, List<Node>{
 		res.addAll(lst);
 		return res;
 	}
+	
+	public Node getChildByTag(String tag){
+		QList childList = this.getChildren();
+		for (int j=0;j<childList.size();++j){
+			if (childList.get(j).getNodeName().equals(tag)){
+				return childList.get(j);
+				
+			}
+		}
+		return null;
+	}
 }
