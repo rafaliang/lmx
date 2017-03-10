@@ -142,13 +142,21 @@ import value.QList;
             System.out.println(tree.toStringTree(parser)); // print LISP-style tree
             
             
-            //queryRewriter2 qw= new queryRewriter2();
-            //qw.visit(tree);
+            queryRewriter2 qw= new queryRewriter2();
+            qw.visit(tree);
+            String queryRewrite = qw.rewrite();
             
+            
+            ANTLRInputStream inputRewrite = new ANTLRInputStream( queryRewrite);
+            XQueryLexer lexerRewrite = new XQueryLexer(inputRewrite);
+            CommonTokenStream tokensRewrite = new CommonTokenStream(lexerRewrite);
+            XQueryParser parserRewrite = new XQueryParser(tokensRewrite);
+            ParseTree treeRewrite = parserRewrite.xq();
+            System.out.println(treeRewrite.toStringTree(parser)); // print LISP-style tree
             
             
             xpVisitor xpVisitor = new xpVisitor();
-            QList res = (QList) xpVisitor.visit(tree);
+            QList res = (QList) xpVisitor.visit(treeRewrite);
             
             write2xml(res);
             

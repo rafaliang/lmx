@@ -14,6 +14,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.*;
 
+
 import value.QList;
 import value.VarMap;
 import value.XQValue;
@@ -38,29 +39,168 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 	private Map<String,String> varMap = new HashMap<String,String>();     //variable and its definition
 	private Map<String,String> var2var = new HashMap<String,String>();    //the group a variable belongs to
 	//private Map<String,String> comparison = new HashMap<String,String>();  //var1 eq var2
-	private Map<String,String> eqConstant = new HashMap<String,String>();  //var eq constant
+	private Map<String,List<String>> eqConstant = new HashMap<String,List<String>>();  //var eq constant
 	//private Map<String,String> var1EqVar2 = new HashMap<String,String>();  //var1 eq var2
 	//private Map<String,String> var2EqVar1 = new HashMap<String,String>();  //var2 eq var1
 	private Map<String,List<List<String>>> varEqElem = new HashMap<String,List<List<String>>>();  // which elem of a var is joined
-	private String returnClause="";
+	private String res="";
+	private List<relation> relationLst = new ArrayList<relation>();
+	private Map<String,relation> relationMap = new HashMap<String,relation>();
 	//private String query;
 	
 	queryRewriter2(){
 		//query = q;
 	}
 	
-	public String rewrite(){
-		String res = "";
-		Set<String> used = new HashSet<String>();
-		//Set<String> unused = new HashSet
-
-		for (Map.Entry<String,List<List<String>>> entry : varEqElem.entrySet()) { 
-			String str = entry.getKey();
-			List<List<String>> lstLst = entry.getValue();
-			String[] varLst = str.split("-");
-			String var1 = varLst[0];
-			String var2 = varLst[1];
+	private class attribute{
+		private String name="";
+		private List<attribute> eqTo = new ArrayList<attribute>();
+		private relation rel= new relation();
+		
+		attribute(){}
+		
+		attribute(String n){
+			name = n;
+			//eqTo.addAll(lst);
 		}
+		
+		attribute(String n, List<attribute> lst){
+			name = n;
+			eqTo.addAll(lst);
+		}
+		
+		public String getName(){return name;}
+		public void setName(String n){name = n;return;}
+		public void addEqTo(attribute jnode){
+			eqTo.add(jnode);
+		}
+		public List<attribute> getEqTo(){
+			return eqTo;
+		}
+		public relation getRelation(){
+			return rel;
+		}
+		public void setRelation(relation r){
+			rel = r;
+		}
+	}
+	
+	private class relation{
+		private String name = "";
+		private List<attribute> attributes = new ArrayList<attribute>();
+		
+		relation(){};
+		relation(String n){
+			name = n;
+			//children.addAll(lst);
+		}
+		relation(String n, List<attribute> lst){
+			name = n;
+			attributes.addAll(lst);
+		}
+		
+		public String getName(){return name;}
+		public void setName(String n){name = n;return;}
+		public void addAttr(attribute attr){attributes.add(attr);}
+		public List<attribute> getAttributes(){return attributes;}
+		
+		public boolean canJoin(relation r2){
+			for (attribute attr:attributes){
+				for (attribute attr2:attr.getEqTo()){
+					if (attr2.getRelation()==r2)
+						return true;
+				}
+			}
+			return false;
+		}
+		
+		public relation join(relation r2){
+			List<attribute> eq1 = new ArrayList<attribute>();
+			List<attribute> eq2 = new ArrayList<attribute>();
+			for (attribute attr:attributes){
+				for (attribute attr2:attr.getEqTo()){
+					if (attr2.getRelation()==r2){
+						eq1.add(attr);
+						eq2.add(attr2);
+					}
+				}
+			}
+			List<attribute> newAttributes = new ArrayList<attribute>();
+			newAttributes.addAll(attributes);
+			newAttributes.addAll(r2.getAttributes());
+			relation relationJoined = new relation("relationJoined",newAttributes);
+			
+			
+			
+			return relationJoined;
+		}
+		
+		public String getJoinAttributes(relation r2){
+			List<attribute> eq1 = new ArrayList<attribute>();
+			List<attribute> eq2 = new ArrayList<attribute>();
+			for (attribute attr:attributes){
+				for (attribute attr2:attr.getEqTo()){
+					if (attr2.getRelation()==r2){
+						eq1.add(attr);
+						eq2.add(attr2);
+					}
+				}
+			}
+			String res = "";
+			res+="[";
+			for (attribute att:eq1)
+				res += (att.getName().substring(1)+", ");
+			res = res.substring(0, res.length()-2);
+			res += "], ";
+			res+="[";
+			for (attribute att:eq2)
+				res += (att.getName().substring(1)+", ");
+			res = res.substring(0, res.length()-2);
+			res += "]";
+			return res;
+		}
+		
+		public attribute getAttrByName(String attName){
+			for (attribute att:attributes){
+				if (att.getName().equals(attName))
+					return att;
+			}
+			return null;
+		}
+		
+		public String toStr(List<String> eqConst, Map<String,String>varMap){
+			String res="";
+			res += ("for "+this.getName()+" in "+varMap.get(this.getName())+",\n");
+			for (attribute att:attributes){
+				String attName=att.getName();
+				res+=(attName+" in "+varMap.get(attName)+",\n");
+			}
+			res = res.substring(0, res.length()-2);
+			res+="\n";
+			if (eqConst!=null && !eqConst.isEmpty()){
+				res += "where ";
+				for (String str:eqConst){
+					res += (str+",\n");
+				}
+				res = res.substring(0, res.length()-2);
+				res += "\n";
+			}
+			res+= "return <tuple>{\n";
+			String relName = this.getName().substring(1);
+			res+=("<"+relName+">"+"{$"+relName+"}</"+relName+">,\n");
+			for (attribute att:attributes){
+				String attName=att.getName();
+				attName = attName.substring(1);
+				res+=("<"+attName+">"+"{$"+attName+"}</"+attName+">,\n");
+			}
+			res = res.substring(0, res.length()-2);
+			res += "\n}</tuple>,";
+			return res;
+		}
+	}
+	
+	public String rewrite(){
+		System.out.println(res);
 		
 		return res;
 	}
@@ -95,11 +235,26 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 				//System.out.println(varName);
 				var2var.put(varName, varName);
 				List<String> lst = new ArrayList<String>();
-				lst.add(varName);
+				//lst.add(varName);
 				varGroup.put(varName, lst);
 			}
-			
-		}/*
+		}
+		
+		
+		for (String r:varGroup.keySet()){
+			relation rel = new relation(r);
+			for (String att:varGroup.get(r)){
+				attribute attr = new attribute(att);
+				attr.setRelation(rel);
+				rel.addAttr(attr);
+			}
+			relationLst.add(rel);
+			relationMap.put(r, rel);
+		}
+		
+		
+		
+		/*
 		for (String var:varGroup.keySet()){
 			System.out.println(var);
 			List<String> group = varGroup.get(var);
@@ -118,54 +273,69 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 	}*/
 	
 	public Integer visitCondEQ(XQueryParser.CondEQContext ctx) { 
-		String str1 = ctx.left.getText();
-		String str2 = ctx.right.getText();
-		if (!str2.startsWith("$")){
-			eqConstant.put(str1, str2);
+		String var1 = ctx.left.getText();
+		String var2 = ctx.right.getText();
+		if (var2.startsWith("$")){
+			String r1 = var2var.get(var1);
+			String r2 = var2var.get(var2);
+			relation rel1 = relationMap.get(r1);
+			relation rel2 = relationMap.get(r2);
+			attribute att1 = rel1.getAttrByName(var1);
+			attribute att2 = rel2.getAttrByName(var2);
+			att1.addEqTo(att2);
+			att2.addEqTo(att1);
 		}
 		else{
-			//var1EqVar2.put(str1, str2);
-			//var2EqVar1.put(str2, str1);
-			String var1 = var2var.get(str1);
-			String var2 = var2var.get(str2);
-			//System.out.println(var1);
-			//System.out.println(var2);
-			String str="";
-			if (var1.compareTo(var2)<0)
-				str = var1+"-"+var2;
-			else{
-				String tmp;
-				tmp = str1;
-				str1 = str2;
-				str2 = tmp;
-				str = var2+"-"+var1;
-			}
-			if (varEqElem.containsKey(str)){
-				List<List<String>> lst = varEqElem.get(str);
-				lst.get(0).add(str1);
-				lst.get(1).add(str2);
-				//System.out.println(lst);
+			String r1 = var2var.get(var1);
+			relation rel1 = relationMap.get(r1);
+			if (eqConstant.containsKey(rel1)){
+				List<String> tmp = eqConstant.get(rel1);
+				tmp.add(var1+" eq "+var2);
+				eqConstant.put(r1, tmp);
 			}
 			else{
-				List<List<String>> lst = new ArrayList<List<String>>();
-				List<String> lst0 = new ArrayList<String>();
-				lst0.add(str1);
-				List<String> lst1 = new ArrayList<String>();
-				lst1.add(str2);
-				lst.add(lst0);
-				lst.add(lst1);
-				varEqElem.put(str, lst);
-				//System.out.println(lst);
+				List<String> tmp = new ArrayList<String>();
+				tmp.add(var1+" eq "+var2);
+				eqConstant.put(r1, tmp);
 			}
-			//varEqElem.put(str, value)
+			
 		}
 		return 0;
 	}
 	
 	public Integer visitReturnClause(XQueryParser.ReturnClauseContext ctx) { 
+		relation joined = relationLst.get(0);
+		res = joined.toStr(eqConstant.get(joined.getName()), varMap);
+		relationLst.remove(0);
+		while (!relationLst.isEmpty()){
+			boolean hasRemoved = false;
+			for (int i=0;i<relationLst.size();++i){
+				relation rel = relationLst.get(i);
+				if (joined.canJoin(rel)){
+					relationLst.remove(i);
+					hasRemoved = true;
+					res += "\n\n";
+					res += rel.toStr(eqConstant.get(rel.getName()), varMap);
+					res += ("\n"+joined.getJoinAttributes(rel)+"\n),");
+					res = "join ("+res;
+					joined = joined.join(rel);
+					break;
+				}
+			}
+			if (!hasRemoved){
+				System.out.println("cannot rewrite the query, please check the query!");
+				return 0;
+			}
+		}
+		res = res.substring(0,res.length()-1);
+		//System.out.println(res);
+		
+		
+		res = "for $tuple in "+res;
+		
 		String str = ctx.xq().getText();
 		StringBuffer strBuffer = new StringBuffer(str);
-		System.out.println(strBuffer);
+		//System.out.println(strBuffer);
 		Boolean isVar = false;
 		for (int i=0;i<strBuffer.length();++i){
 			if (strBuffer.charAt(i)=='$'){
@@ -195,8 +365,9 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 				//continue;
 			}
 		}
-		returnClause = new String(strBuffer);
-		//System.out.println(returnClause);
+		res += ("\nreturn "+new String(strBuffer));
+		//System.out.println(res);
+		
 		return 0; 
 	}
 }
