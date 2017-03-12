@@ -1,13 +1,7 @@
-for $a in doc("./src/a.xml")//actor,
-	$aa in $a/age,
-	$an in $a/name,
-	$s in doc("./src/a.xml")//singer,
-	$sa in $s/age,
-	$sn in $s/name
-where $aa eq $sa
-return
-<people-with-ages>{
-	$aa,
-	<actor>{$a/name}</actor>,
-	<singer>{$s/name}</singer>}
-</people-with-ages>
+for $a in doc("xxx.xml")/book,
+    $b in doc("xxx.xml")/entry,
+    $c in $a/title,
+    $d in $a/section,
+    $e in $a/title
+    where $c = $e
+    return <result>{$c}</result>

@@ -139,14 +139,15 @@ import value.QList;
             XQueryParser parser = new XQueryParser(tokens);
             //ParseTree tree = parser.ap(); // begin parsing at rule 'ap'
             ParseTree tree = parser.xq();
-            System.out.println(tree.toStringTree(parser)); // print LISP-style tree
+            //System.out.println(tree.toStringTree(parser)); // print LISP-style tree
             
             
             queryRewriter2 qw= new queryRewriter2();
             qw.visit(tree);
             String queryRewrite = qw.rewrite();
-            
-            
+            if (queryRewrite.equals(""))
+            	queryRewrite = testcase;
+            /*
             ANTLRInputStream inputRewrite = new ANTLRInputStream( queryRewrite);
             XQueryLexer lexerRewrite = new XQueryLexer(inputRewrite);
             CommonTokenStream tokensRewrite = new CommonTokenStream(lexerRewrite);
@@ -158,7 +159,7 @@ import value.QList;
             xpVisitor xpVisitor = new xpVisitor();
             QList res = (QList) xpVisitor.visit(treeRewrite);
             
-            write2xml(res);
+            write2xml(res);*/
             
             
             

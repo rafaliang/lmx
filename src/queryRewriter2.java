@@ -42,10 +42,11 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 	private Map<String,List<String>> eqConstant = new HashMap<String,List<String>>();  //var eq constant
 	//private Map<String,String> var1EqVar2 = new HashMap<String,String>();  //var1 eq var2
 	//private Map<String,String> var2EqVar1 = new HashMap<String,String>();  //var2 eq var1
-	private Map<String,List<List<String>>> varEqElem = new HashMap<String,List<List<String>>>();  // which elem of a var is joined
+	//private Map<String,List<List<String>>> varEqElem = new HashMap<String,List<List<String>>>();  // which elem of a var is joined
 	private String res="";
 	private List<relation> relationLst = new ArrayList<relation>();
 	private Map<String,relation> relationMap = new HashMap<String,relation>();
+	private boolean canRewrite = true;
 	//private String query;
 	
 	queryRewriter2(){
@@ -200,7 +201,12 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 	}
 	
 	public String rewrite(){
-		System.out.println(res);
+		if (canRewrite)
+			System.out.println(res);
+		else{
+			System.out.println("No rewrite is applied");
+			res = "";
+		}
 		
 		return res;
 	}
@@ -227,6 +233,7 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 				}
 				else{
 					System.out.println("Illegal input");
+					canRewrite = false;
 					return 0;
 				}
 				
@@ -278,12 +285,27 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 		if (var2.startsWith("$")){
 			String r1 = var2var.get(var1);
 			String r2 = var2var.get(var2);
-			relation rel1 = relationMap.get(r1);
-			relation rel2 = relationMap.get(r2);
-			attribute att1 = rel1.getAttrByName(var1);
-			attribute att2 = rel2.getAttrByName(var2);
-			att1.addEqTo(att2);
-			att2.addEqTo(att1);
+			if (r1!=r2){
+				relation rel1 = relationMap.get(r1);
+				relation rel2 = relationMap.get(r2);
+				attribute att1 = rel1.getAttrByName(var1);
+				attribute att2 = rel2.getAttrByName(var2);
+				att1.addEqTo(att2);
+				att2.addEqTo(att1);
+			}
+			else{
+				relation rel1 = relationMap.get(r1);
+				if (eqConstant.containsKey(rel1)){
+					List<String> tmp = eqConstant.get(rel1);
+					tmp.add(var1+" eq "+var2);
+					eqConstant.put(r1, tmp);
+				}
+				else{
+					List<String> tmp = new ArrayList<String>();
+					tmp.add(var1+" eq "+var2);
+					eqConstant.put(r1, tmp);
+				}
+			}
 		}
 		else{
 			String r1 = var2var.get(var1);
@@ -324,6 +346,7 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 			}
 			if (!hasRemoved){
 				System.out.println("cannot rewrite the query, please check the query!");
+				canRewrite = false;
 				return 0;
 			}
 		}
