@@ -3,22 +3,22 @@
  */
 grammar XQuery;
 
-xq:
+xq: 
 Var #xqVAR
 | StringConstant #xqString
-| ap #xqAP
+| ap #xqAP 
 | '(' xq ')' #xqPARA
-| left=xq ',' right=xq #xqCOMMA
-| xq '/' rp #xqSL
+| xq '/' rp #xqSL 
 | xq '//' rp #xqDSL
+| left=xq ',' right=xq #xqCOMMA
+| joinClause #xqJoin
 | '<'leftT=tagName'>' '{'xq'}' '</'rightT=tagName'>' #xqTAG
 | forClause letClause? whereClause? returnClause #xqFOR
 | letClause xq #xqLET
-| joinClause #xqJoin
 ;
 
 forClause:
-'for' Var 'in' xq (',' Var 'in' xq)*
+'for' Var 'in' xq (',' Var 'in' xq)* 
 ;
 
 letClause:
@@ -37,7 +37,8 @@ joinClause:
 'join' '(' xq1=xq ',' xq2=xq ',' varList1 = VarList ',' varList2 = VarList ')'
 ;
 
-VarList: '[' NAME (','NAME)*']';
+
+VarList: '[' NAME (', ' NAME)*']';
 
 
 cond:

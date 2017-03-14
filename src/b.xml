@@ -1,0 +1,55 @@
+<root>
+<students>
+	<student id="s1">
+		<name>James</name>
+		<takeClass>CSE232</takeClass>
+	</student>
+	
+	<student id="s2">
+		<name>Rafa</name>
+		<takeClass>CSE231</takeClass>
+	</student>
+			
+	<student id="s3">
+		<name>Lance</name>
+		<takeClass>CSE252</takeClass>
+	</student>
+		
+</students>
+
+<teachers>
+	<teacher id="t1">
+		<name>AA</name>
+		<teachClass>CSE252</teachClass>
+	</teacher>
+	
+	<teacher id="t2">
+		<name>BB</name>
+		<teachClass>CSE232</teachClass>
+	</teacher>
+	
+	<teacher id="t3">
+		<name>CC</name>
+		<teachClass>CSE231</teachClass>
+	</teacher>
+	
+</teachers>
+
+<classes>
+	<class id="c1">
+		<classroom>R100</classroom>
+		<Id>CSE252</Id>
+	</class>
+	
+	<class id="c2">
+		<classroom>R200</classroom>
+		<Id>CSE231</Id>
+	</class>
+	
+	<class id="c3">
+		<classroom>R300</classroom>
+		<Id>CSE232</Id>
+	</class>
+</classes>
+
+</root>

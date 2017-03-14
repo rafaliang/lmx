@@ -166,6 +166,7 @@ public class xqueryEvaluator{
 			return new QList();
 		}
 		//QList xqRes = (QList) visitor.visit(ctx.xq());
+		
 		return new QList(makeElem((QList) visitor.visit(ctx.xq()),ctx.leftT.getText()));
 	}
 	
@@ -193,8 +194,15 @@ public class xqueryEvaluator{
 	public QList evalXqCOMMA(XQueryParser.XqCOMMAContext ctx) { 
 		QList left = (QList) visitor.visit(ctx.left);
 		QList right = (QList) visitor.visit(ctx.right);
-		left.addAll(right);
-		return left;
+		//System.out.println(ctx.left.getText());
+		//System.out.println(left.size());
+		//System.out.println(ctx.right.getText());
+		//System.out.println(right.size());
+		QList res = new QList();
+		res.addAll(left);
+		res.addAll(right);
+		//left.addAll(right);
+		return res;
 	}
 	
 	private VMList getVMListFor(int idx, XQueryParser.ForClauseContext ctx, VarMap prevVar){
@@ -369,6 +377,7 @@ public class xqueryEvaluator{
 			String tag = varList1[0];
 			Node nodeByTag = new QList(node1).getChildByTag(tag).getFirstChild();
 			String nodeStr = this.getString(nodeByTag);
+			//System.out.println(nodeStr);
 			if (!nodeMap.containsKey(nodeStr)) continue;
 			QList lst = nodeMap.get(nodeStr);
 			for (Node node2:lst){
@@ -377,6 +386,7 @@ public class xqueryEvaluator{
 					String tag1 = varList1[i];
 					String tag2 = varList2[i];
 					//System.out.println(tag1);
+					if (new QList(node1).getChildByTag(tag1)==null || new QList(node2).getChildByTag(tag1)==null) continue;
 					Node node1ByTag = new QList(node1).getChildByTag(tag1).getFirstChild();
 					Node node2ByTag = new QList(node2).getChildByTag(tag2).getFirstChild();
 					
@@ -389,6 +399,8 @@ public class xqueryEvaluator{
 				QList tmp = new QList();
 				tmp.addAll(new QList(node1).getChildren());
 				tmp.addAll(new QList(node2).getChildren());
+				//System.out.println(new QList(node1).getChildren().size());
+				//System.out.println(new QList(node2).getChildren().size());
 				//for (int i=0;i<tmp.size();++i)
 					//System.out.println(tmp.get(i).getTextContent());
 				Node tuple = makeElem(tmp,"tuple");
@@ -422,14 +434,15 @@ public class xqueryEvaluator{
 							break;
 						}
 					}
+					if (node1Tag==null||node2Tag==null) continue;
 					QList node1TagChild = new QList(node1Tag).getChildren();
 					QList node2TagChild = new QList(node2Tag).getChildren();
-					System.out.println("test");
+					//System.out.println("test");
 					
 					String xml = "";
 					
-					System.out.println(xml);
-					System.out.println(node2TagChild.get(0).hashCode());
+					//System.out.println(xml);
+					//System.out.println(node2TagChild.get(0).hashCode());
 					if (!node1TagChild.eq(node2TagChild)){
 						equal = false;
 						break;

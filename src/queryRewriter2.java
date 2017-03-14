@@ -50,7 +50,6 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 	//private String query;
 	
 	queryRewriter2(){
-		//query = q;
 	}
 	
 	private class attribute{
@@ -171,7 +170,8 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 		
 		public String toStr(List<String> eqConst, Map<String,String>varMap){
 			String res="";
-			res += ("for "+this.getName()+" in "+varMap.get(this.getName())+",\n");
+			//res += ("for "+this.getName()+" in "+varMap.get(this.getName())+",\n");
+			res += ("for ");
 			for (attribute att:attributes){
 				String attName=att.getName();
 				res+=(attName+" in "+varMap.get(attName)+",\n");
@@ -188,7 +188,7 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 			}
 			res+= "return <tuple>{\n";
 			String relName = this.getName().substring(1);
-			res+=("<"+relName+">"+"{$"+relName+"}</"+relName+">,\n");
+			//res+=("<"+relName+">"+"{$"+relName+"}</"+relName+">,\n");
 			for (attribute att:attributes){
 				String attName=att.getName();
 				attName = attName.substring(1);
@@ -242,7 +242,7 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 				//System.out.println(varName);
 				var2var.put(varName, varName);
 				List<String> lst = new ArrayList<String>();
-				//lst.add(varName);
+				lst.add(varName);
 				varGroup.put(varName, lst);
 			}
 		}

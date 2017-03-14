@@ -1,10 +1,12 @@
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,65 +103,55 @@ import value.QList;
         	return res;
         }
     	
-    	public static void main( String[] args) throws Exception 
+        private static void saveRewrite(String rewrite){
+        	String path = "./src/rewrite.txt";
+        	try{
+        		File file=new File(path);
+        		if(file.isFile() && file.exists()){ 
+        			//System.out.println("aa");
+        			FileOutputStream o = new FileOutputStream(file);
+                    o.write(rewrite.getBytes("GBK"));
+                    o.close();
+        		}
+        	}
+    		catch (Exception e) {
+                System.out.println(e);
+                e.printStackTrace();
+            }
+        	return;
+        }
+        
+        public static void main( String[] args) throws Exception 
         {
-        	//String testcase = "doc(\"./src/a.xml\")//age/text()/../.. [text()]";
-        	//String testcase = "<hello>{\"hello\"}</hello>";
-        	//String testcase = "for $x in doc(\"./src/a.xml\")//actor let $y:=$x/.., $z:=$y/*/text() where $z=\'Michael Caine\' return $z";
-        	//String testcase = "for $x in doc(\"./src/a.xml\")//actors where some $y in $x/actor/text(), $z in $y/../age/text() satisfies $y='Michael Caine' and $z='41' return $x";
-        	//String testcase = "for $x in doc(\"./src/a.xml\")//actors let $y:=$x/actor,$z:=$y/age/text() where $y/text()=\"Michael Caine\" and $z='41' return $x";
-        	//String testcase = "for $x in doc(\"./src/a.xml\")//actors where some  $y in $x/actor,$z in $y/age/text() satisfies $y/text()=\"Michael Caine\" and $z='41' return $x";
-        	
-        	// test cases for xquery (4 in total)
-        	//String testcase = "<acts> {	for $a in doc(\"./src/j_caesar.xml\")//ACT where not empty( for $sp in $a/SCENE/SPEECH/SPEAKER where $sp/text() = \"CASCA\" return <speaker> {$sp/text()}</speaker> )return <act>{$a/TITLE/text()}</act>}</acts>";
-        	
-        	//String testcase="<result>{  for $a in (for $s in doc(\"./src/j_caesar.xml\")//ACT return $s), $sc in (for $t in $a/SCENE return $t), $sp in (for $d in $sc/SPEECH return $d) where $sp/LINE/text() = 'Et tu, Brute! Then fall, Caesar.' return <who>{$sp/SPEAKER/text()}</who>, <when>{ <act>{$a/TITLE/text()}</act>, <scene>{$sc/TITLE/text()}</scene> }</when>}</result>" ;
-        	//String testcase = "<result>{ for $a in doc(\"./src/j_caesar.xml\")//PERSONAE, $b in $a/PERSONA where ($b/text() = \'JULIUS CAESAR\') or ($b/text() = 'Another Poet') return $b}</result>" ;
-        	//String testcase = "<result>{ for $a in doc(\"./src/j_caesar.xml\")//PERSONAE, $b in $a/PERSONA where not (($b/text() = 'JULIUS CAESAR') or ($b/text() = 'Another Poet') ) return $b}</result>" ;
-        	
-        	//String testcase = "<result>{ for $a in document(\"./src/j_caesar.xml\")//ACT, $sc in $a//SCENE,$sp in $sc/SPEECH where $sp/LINE/text() eq \"Et tu, Brute! Then fall, Caesar.\" return <who>{$sp/SPEAKER/text()}</who>, <when>{<act>{$a/TITLE/text()}</act>,<scene>{$sc/TITLE/text()}</scene>}</when>}</result>";
-        	//String testcase = "for $s in document(\"./src/j_caesar.xml\")//SPEAKER return <speaks>{<who>{$s/text()}</who>, for $a in document(\"./src/j_caesar.xml\")//ACT where some $s1 in $a//SPEAKER satisfies $s1 eq $s return <when>{$a/TITLE/text()}</when>} </speaks>";
         	String testcase=readQuery();
-        	
-        	         	
-        	
-        	// DEMOOOOOOOOOOOOOOOOOOOO
-        	
-        	
-        	
-        	
-        	
-        	//ANTLRInputStream input = new ANTLRInputStream( System.in);
-        	//String testcase = "for $id in \"ids\" return $id";
+
+        	//rewrite
         	ANTLRInputStream input = new ANTLRInputStream( testcase);
             XQueryLexer lexer = new XQueryLexer(input);
-            
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-            
             XQueryParser parser = new XQueryParser(tokens);
-            //ParseTree tree = parser.ap(); // begin parsing at rule 'ap'
             ParseTree tree = parser.xq();
-            //System.out.println(tree.toStringTree(parser)); // print LISP-style tree
-            
-            
             queryRewriter2 qw= new queryRewriter2();
             qw.visit(tree);
             String queryRewrite = qw.rewrite();
             if (queryRewrite.equals(""))
             	queryRewrite = testcase;
-            /*
+            saveRewrite(queryRewrite);
+            //queryRewrite = testcase;
+            
+            // run rewrite query
             ANTLRInputStream inputRewrite = new ANTLRInputStream( queryRewrite);
             XQueryLexer lexerRewrite = new XQueryLexer(inputRewrite);
             CommonTokenStream tokensRewrite = new CommonTokenStream(lexerRewrite);
             XQueryParser parserRewrite = new XQueryParser(tokensRewrite);
             ParseTree treeRewrite = parserRewrite.xq();
-            System.out.println(treeRewrite.toStringTree(parser)); // print LISP-style tree
+            System.out.println(treeRewrite.toStringTree(parserRewrite)); // print LISP-style tree
             
             
             xpVisitor xpVisitor = new xpVisitor();
             QList res = (QList) xpVisitor.visit(treeRewrite);
             
-            write2xml(res);*/
+            write2xml(res);
             
             
             

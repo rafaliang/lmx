@@ -1,62 +1,234 @@
 <?xml version="1.0" encoding="UTF-8"?><myResult>
-<people-with-ages>
-<age>51</age>
-<actor>
-<name>
-				<first_name>Christian</first_name>
-				<last_name>Bale</last_name>
-			</name>
-</actor>
-<singer>
-<name>
-				<first_name>Tom</first_name>
-				<last_name>Waits</last_name>
-			</name>
-</singer>
-</people-with-ages>
-<people-with-ages>
-<age>41</age>
-<actor>
-<name>
-				<first_name>Liam</first_name>
-				<last_name>Neeson</last_name>
-			</name>
-</actor>
-<singer>
-<name>
-				<first_name>B.B.</first_name>
-				<last_name>King</last_name>
-			</name>
-</singer>
-</people-with-ages>
-<people-with-ages>
-<age>31</age>
-<actor>
-<name>
-				<first_name>Michael</first_name>
-				<last_name>Caine</last_name>
-			</name>
-</actor>
-<singer>
-<name>
-				<first_name>Ray</first_name>
-				<last_name>Charles</last_name>
-			</name>
-</singer>
-</people-with-ages>
-<people-with-ages>
-<age>31</age>
-<actor>
-<name>
-				<first_name>Michael</first_name>
-				<last_name>Caine</last_name>
-			</name>
-</actor>
-<singer>
-<name>
-				<first_name>Michael</first_name>
-				<last_name>Caine</last_name>
-			</name>
-</singer>
-</people-with-ages>
+<triplet>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+</triplet>
+<triplet>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+</triplet>
+<triplet>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+</triplet>
+<triplet>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+</triplet>
+<triplet>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+</triplet>
+<triplet>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+</triplet>
+<triplet>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1994">
+<title>TCP/IP Illustrated</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+</triplet>
+<triplet>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+<book year="1992">
+<title>Advanced Programming in the Unix environment</title>
+<author>
+<last>Stevens</last>
+<first>W.</first>
+</author>
+<publisher>Addison-Wesley</publisher>
+<price>65.95</price>
+</book>
+</triplet>
 </myResult>
