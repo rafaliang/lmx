@@ -137,6 +137,7 @@ import value.QList;
             if (queryRewrite.equals(""))
             	queryRewrite = testcase;
             saveRewrite(queryRewrite);
+            
             //queryRewrite = testcase;
             
             // run rewrite query

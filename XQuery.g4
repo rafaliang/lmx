@@ -38,7 +38,8 @@ joinClause:
 ;
 
 
-VarList: '[' NAME (', ' NAME)*']';
+VarList: '[' NAME (', ' NAME)*']'|'[]'
+;
 
 
 cond:

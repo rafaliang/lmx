@@ -147,16 +147,19 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 				}
 			}
 			String res = "";
-			res+="[";
-			for (attribute att:eq1)
-				res += (att.getName().substring(1)+", ");
-			res = res.substring(0, res.length()-2);
-			res += "], ";
-			res+="[";
-			for (attribute att:eq2)
-				res += (att.getName().substring(1)+", ");
-			res = res.substring(0, res.length()-2);
-			res += "]";
+			if (eq1.isEmpty()) res+="[], []";
+			else{
+				res+="[";
+				for (attribute att:eq1)
+					res += (att.getName().substring(1)+", ");
+				res = res.substring(0, res.length()-2);
+				res += "], ";
+				res+="[";
+				for (attribute att:eq2)
+					res += (att.getName().substring(1)+", ");
+				res = res.substring(0, res.length()-2);
+				res += "]";
+			}
 			return res;
 		}
 		
@@ -329,6 +332,8 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 		relation joined = relationLst.get(0);
 		res = joined.toStr(eqConstant.get(joined.getName()), varMap);
 		relationLst.remove(0);
+		
+		/*
 		while (!relationLst.isEmpty()){
 			boolean hasRemoved = false;
 			for (int i=0;i<relationLst.size();++i){
@@ -349,10 +354,24 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 				canRewrite = false;
 				return 0;
 			}
+		}*/
+		
+		// this implementation allows cartesian product
+		for (int i=0;i<relationLst.size();++i){
+			relation rel = relationLst.get(i);
+			
+				
+			res += "\n\n";
+			res += rel.toStr(eqConstant.get(rel.getName()), varMap);
+			res += ("\n"+joined.getJoinAttributes(rel)+"\n),");
+			res = "join ("+res;
+			joined = joined.join(rel);
+
 		}
+		
+		
 		res = res.substring(0,res.length()-1);
 		//System.out.println(res);
-		
 		
 		res = "for $tuple in "+res;
 		
@@ -368,7 +387,7 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 				continue;
 			}
 			if (isVar){
-				if (strBuffer.charAt(i)==',' ||strBuffer.charAt(i)=='}'){
+				if (strBuffer.charAt(i)==',' ||strBuffer.charAt(i)=='}'||strBuffer.charAt(i)==' '){
 					//System.out.println(i);
 					strBuffer.insert(i, "/*");
 				}

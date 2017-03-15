@@ -353,13 +353,34 @@ public class xqueryEvaluator{
 		QList ql2 = (QList) visitor.visit(ctx.xq2);
 		String var1 = ctx.varList1.getText();
 		String var2 = ctx.varList2.getText();
+		
+		
+		//join on nothing: Cartesian Product
+		if (var1.equals("[]") || var2.equals("[]")){
+			for (Node node1:ql1){
+				for (Node node2:ql2){
+					QList tmp = new QList();
+					tmp.addAll(new QList(node1).getChildren());
+					tmp.addAll(new QList(node2).getChildren());
+					Node tuple = makeElem(tmp,"tuple");
+					res.add(tuple);
+				}
+			}
+			//System.out.println(res.size());
+			return res;
+		}
+		
+		
+		// join on attributes
 		String[] varList1= var1.substring(1,var1.length()-1).split(",");
 		String[] varList2= var2.substring(1,var2.length()-1).split(",");
 		Map<String,QList> nodeMap = new HashMap<String,QList>();
+		//System.out.println(varList1.length);
 		
 		// if compare list is not equal size or is empty return empty list
 		if (varList1.length==0 || varList1.length!=varList2.length) return res;
 		
+		// create index on the second result list on the first joined attribute
 		for (Node node2:ql2){
 			String tag2 = varList2[0];
 			Node nodeByTag = new QList(node2).getChildByTag(tag2).getFirstChild();
@@ -373,43 +394,55 @@ public class xqueryEvaluator{
 			else nodeMap.put(node2Str, new QList(node2));
 		}
 		
+		// scan over all nodes in querylist 1
 		for (Node node1:ql1){
 			String tag = varList1[0];
 			Node nodeByTag = new QList(node1).getChildByTag(tag).getFirstChild();
 			String nodeStr = this.getString(nodeByTag);
 			//System.out.println(nodeStr);
+			
+			// if hashcode is not found, this node cannot be joined
 			if (!nodeMap.containsKey(nodeStr)) continue;
+			
+			// find all node2 with same attribute value
 			QList lst = nodeMap.get(nodeStr);
 			for (Node node2:lst){
 				Boolean equal = true;
+				// check other attributes
 				for (int i=1;i<varList1.length;++i){
 					String tag1 = varList1[i];
 					String tag2 = varList2[i];
-					//System.out.println(tag1);
-					if (new QList(node1).getChildByTag(tag1)==null || new QList(node2).getChildByTag(tag1)==null) continue;
+					tag1 = tag1.substring(1);
+					tag2 = tag2.substring(1);
+					if (new QList(node1).getChildByTag(tag1)==null || new QList(node2).getChildByTag(tag2)==null) {
+						equal = false;
+						break;
+					}
 					Node node1ByTag = new QList(node1).getChildByTag(tag1).getFirstChild();
 					Node node2ByTag = new QList(node2).getChildByTag(tag2).getFirstChild();
 					
+					
+					
+					// if one of the attributes is not the same, stop join
 					if (!node1ByTag.isEqualNode(node2ByTag)){
 						equal = false;
 						break;
 					}
 				}
 				if (!equal) continue;
+				
+				// add all children of node1 and node2 to new node
 				QList tmp = new QList();
 				tmp.addAll(new QList(node1).getChildren());
 				tmp.addAll(new QList(node2).getChildren());
-				//System.out.println(new QList(node1).getChildren().size());
-				//System.out.println(new QList(node2).getChildren().size());
-				//for (int i=0;i<tmp.size();++i)
-					//System.out.println(tmp.get(i).getTextContent());
+				
+				//create the new node
 				Node tuple = makeElem(tmp,"tuple");
-				//System.out.println(tuple.getChildNodes().getLength());
-				//System.out.println(tuple.getTextContent());
 				res.add(tuple);
 			}
 		}
 		
+		//  naive implementation
 		/*
 		for (Node node1:ql1){
 			for (Node node2:ql2){
