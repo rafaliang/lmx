@@ -3,7 +3,7 @@
  */
 grammar XQuery;
 
-xq: 
+xq:  
 Var #xqVAR
 | StringConstant #xqString
 | ap #xqAP 

@@ -184,9 +184,9 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 			if (eqConst!=null && !eqConst.isEmpty()){
 				res += "where ";
 				for (String str:eqConst){
-					res += (str+",\n");
+					res += (str+" and ");
 				}
-				res = res.substring(0, res.length()-2);
+				res = res.substring(0, res.length()-4);
 				res += "\n";
 			}
 			res+= "return <tuple>{\n";
@@ -205,7 +205,8 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 	
 	public String rewrite(){
 		if (canRewrite)
-			System.out.println(res);
+			//System.out.println(res);
+			System.out.println("A rewrite is applied");
 		else{
 			System.out.println("No rewrite is applied");
 			res = "";
@@ -215,6 +216,8 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 	}
 	
 	public Integer visitForClause(XQueryParser.ForClauseContext ctx) {
+		for (int i=0;i<ctx.xq().size();++i)
+			this.visit(ctx.xq(i));
 		for (int i=0;i<ctx.Var().size();++i){
 			String varName = ctx.Var().get(i).getText();
 			//varName = varName.substring(1);
@@ -282,6 +285,8 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 		return 0;
 	}*/
 	
+	
+	
 	public Integer visitCondEQ(XQueryParser.CondEQContext ctx) { 
 		String var1 = ctx.left.getText();
 		String var2 = ctx.right.getText();
@@ -297,10 +302,13 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 				att2.addEqTo(att1);
 			}
 			else{
-				relation rel1 = relationMap.get(r1);
-				if (eqConstant.containsKey(rel1)){
-					List<String> tmp = eqConstant.get(rel1);
-					tmp.add(var1+" eq "+var2);
+				//relation rel1 = relationMap.get(r1);
+				//System.out.println(r1);
+				if (eqConstant.containsKey(r1)){
+					List<String> tmp = eqConstant.get(r1);
+					String str = var1+" eq "+var2;
+					tmp.add(str);
+					//System.out.println(str);
 					eqConstant.put(r1, tmp);
 				}
 				else{
@@ -312,9 +320,9 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 		}
 		else{
 			String r1 = var2var.get(var1);
-			relation rel1 = relationMap.get(r1);
-			if (eqConstant.containsKey(rel1)){
-				List<String> tmp = eqConstant.get(rel1);
+			//relation rel1 = relationMap.get(r1);
+			if (eqConstant.containsKey(r1)){
+				List<String> tmp = eqConstant.get(r1);
 				tmp.add(var1+" eq "+var2);
 				eqConstant.put(r1, tmp);
 			}
@@ -329,6 +337,7 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 	}
 	
 	public Integer visitReturnClause(XQueryParser.ReturnClauseContext ctx) { 
+		//System.out.println("return clause");
 		relation joined = relationLst.get(0);
 		res = joined.toStr(eqConstant.get(joined.getName()), varMap);
 		relationLst.remove(0);
@@ -412,4 +421,12 @@ public class queryRewriter2 extends XQueryBaseVisitor<Integer>{
 		
 		return 0; 
 	}
+	
+	public Integer visitXqJoin(XQueryParser.XqJoinContext ctx) { 
+		System.out.println("join already exists");
+		canRewrite = false;
+		return 0;
+	}
+	
+	
 }

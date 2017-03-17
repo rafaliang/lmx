@@ -131,6 +131,7 @@ import value.QList;
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             XQueryParser parser = new XQueryParser(tokens);
             ParseTree tree = parser.xq();
+            //System.out.println(tree.toStringTree(parser));
             queryRewriter2 qw= new queryRewriter2();
             qw.visit(tree);
             String queryRewrite = qw.rewrite();
@@ -139,6 +140,7 @@ import value.QList;
             saveRewrite(queryRewrite);
             
             //queryRewrite = testcase;
+            //System.out.println(x);
             
             // run rewrite query
             ANTLRInputStream inputRewrite = new ANTLRInputStream( queryRewrite);
@@ -146,12 +148,12 @@ import value.QList;
             CommonTokenStream tokensRewrite = new CommonTokenStream(lexerRewrite);
             XQueryParser parserRewrite = new XQueryParser(tokensRewrite);
             ParseTree treeRewrite = parserRewrite.xq();
-            System.out.println(treeRewrite.toStringTree(parserRewrite)); // print LISP-style tree
+            //System.out.println(treeRewrite.toStringTree(parserRewrite)); // print LISP-style tree
             
             
             xpVisitor xpVisitor = new xpVisitor();
             QList res = (QList) xpVisitor.visit(treeRewrite);
-            
+            //System.out.println(res.size());
             write2xml(res);
             
             
